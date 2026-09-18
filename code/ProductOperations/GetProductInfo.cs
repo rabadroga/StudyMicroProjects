@@ -32,7 +32,5 @@ static class GetProductInfo
                 Console.WriteLine("Вы ввели недопустимую цену:");
                 priceInput = Console.ReadLine();
             }
-
-        //TODO Потом продолжить дальше делать прк1 -- калькулятор и вывод
     }
 }

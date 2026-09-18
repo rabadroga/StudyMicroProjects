@@ -4,8 +4,17 @@ static class CalculateProductPrice
 {
     public static void CalculatingProductPrice()
     {
-        decimal TotalPrice = quaintity * price*1.12;
-        //TODO Сделать калькулятор цены товара с учетом НДС. 
-        // Вывести результат на экран.
+        decimal totalPriceNoNDA = quantity * price;
+        decimal ndaOfTotalPrice = totalPriceNoNDA * 0.16m; // НДС -- 16%
+        decimal totalPriceWithNDA = totalPriceNoNDA * 1.16m; // +НДС -- 16%
     }
+    public static void DisplayingTotalPrice()
+    {
+        Console.WriteLine($"Артикул товара: {article}");
+        Console.WriteLine($"Количество товара: {quantity}");
+        Console.WriteLine($"Общая стоимость товара без НДС: {totalPriceNoNDA:C} тенге");
+        Console.WriteLine($"Сумма НДС: {ndaOfTotalPrice:C} тенге");
+        Console.WriteLine($"Общая стоимость товара с НДС: {totalPriceWithNDA:C} тенге");
+    }
+    
 }
