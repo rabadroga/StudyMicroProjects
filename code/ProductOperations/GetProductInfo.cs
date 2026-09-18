@@ -3,11 +3,15 @@ using System;
 static class GetProductInfo
 {
     //Здесь мы получаем 3 параметра от пользователя: артикул (article), количество (quantity) и цену товара (price).
+    public static string? article;
+    public static int quantity;
+    public static decimal price;
     public static void GettingProductInfo()
+    
     {
         //Решил сделать все получение данных в одном методе, так как все данные связаны между собой и логично их получать вместе.
         Console.WriteLine("Введите артикул товара:");
-            string? article = Console.ReadLine();
+            article = Console.ReadLine();
 
             while (article is null or "")
             {
@@ -18,7 +22,7 @@ static class GetProductInfo
         Console.WriteLine("Введите нужное количество:");
             string? quantityInput = Console.ReadLine();
 
-            while (!int.TryParse(quantityInput, out int quantity) || quantity <= 0)
+            while (!int.TryParse(quantityInput, out quantity) || quantity <= 0)
             {
                 Console.WriteLine("Вы ввели недопустимое количество:");
                 quantityInput = Console.ReadLine();
@@ -27,7 +31,7 @@ static class GetProductInfo
         Console.WriteLine("Введите цену соответствующего товара:");
             string? priceInput = Console.ReadLine();
 
-            while (!decimal.TryParse(priceInput, out decimal price) || price <= 0)
+            while (!decimal.TryParse(priceInput, out price) || price <= 0)
             {
                 Console.WriteLine("Вы ввели недопустимую цену:");
                 priceInput = Console.ReadLine();
