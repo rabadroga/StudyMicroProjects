@@ -1,4 +1,4 @@
-# BeginCsh 🚀
+# BeginCsh 
 
 [Русский](#о-проекте) | [English](#about-the-project)
 
