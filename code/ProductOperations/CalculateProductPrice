@@ -1,0 +1,11 @@
+namespace BeginCsh.ProductOperations;
+using System;
+static class CalculateProductPrice
+{
+    public static void CalculatingProductPrice()
+    {
+        decimal TotalPrice = quaintity * price*1.12;
+        //TODO Сделать калькулятор цены товара с учетом НДС. 
+        // Вывести результат на экран.
+    }
+}
