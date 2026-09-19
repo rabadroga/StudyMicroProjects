@@ -7,4 +7,6 @@ using BeginCsh.ProductOperations;
         CalculateProductPrice.DisplayingTotalPrice();
     }
 
+    //TODO полная переработка кода
+
     }
