@@ -1,5 +1,5 @@
-namespace BeginCsh.ProductOperationsV2.PriceCalculator;
-class PriceCalculator
+namespace BeginCsh.ProductOperationsV2;
+public class PriceCalculator
 {
     //Пока что заказ не допускает наличия нескольких позиций. Нет необходимости это прорабатывать в текущем проекте
     public record Order (string Article, int Quantity, decimal Price)

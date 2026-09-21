@@ -1,10 +1,10 @@
-using BeginCsh.ProductOperations;
+using BeginCsh.ProductOperationsV2;
     static class Program
     {
     static void Main()
     {
-        GetProductInfo.GettingProductInfo();
-        CalculateProductPrice.DisplayingTotalPrice();
+        PriceCalculator.Order order = OrderReceiptPrinter.OrderRead();
+        OrderReceiptPrinter.OrderPrint(order);
     }
 
     }
