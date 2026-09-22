@@ -1,10 +1,9 @@
-using BeginCsh.ProductOperationsV2;
+using BeginCsh.PackageDimensionsValidator;
     static class Program
     {
     static void Main()
     {
-        Order order = OrderReceiptPrinter.ReadOrder();
-        OrderReceiptPrinter.PrintOrder(order);
+        
     }
 
     }
