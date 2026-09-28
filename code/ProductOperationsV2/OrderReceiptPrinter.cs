@@ -7,9 +7,9 @@ public static class OrderReceiptPrinter
     //Этот класс включает в себя прием и вывод инфы, он не делает никаких расчетов
     public static Order ReadOrder()
     {
-        string articleRaw = OrderInfoExam<string> ("Введите артикул товара:");
-        int quantityRaw = OrderInfoExam<int> ("Введите количество товара", q => q > 0);
-        decimal priceRaw = OrderInfoExam<decimal> ("Введите цену товара: ", p => p > 0);
+        string articleRaw = InputExam.ExamInput<string> ("Введите артикул товара:");
+        int quantityRaw = InputExam.ExamInput<int> ("Введите количество товара", q => q > 0);
+        decimal priceRaw = InputExam.ExamInput<decimal> ("Введите цену товара: ", p => p > 0);
 
         var order = new Order(articleRaw, quantityRaw, priceRaw);
 
@@ -28,30 +28,4 @@ public static class OrderReceiptPrinter
         Console.WriteLine("===============================================");
     }
 
-    static T OrderInfoExam<T> (string prompt, Func<T, bool>? validator = null, string errorMessage = "Вы ввели недопустимое значение")
-        where T: IParsable<T>
-        {
-        while (true)
-        {
-            Console.WriteLine(prompt);
-            string? input = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                Console.WriteLine(errorMessage);
-                continue;
-            }
-            if (!T.TryParse(input, CultureInfo.CurrentCulture, out T? result) || result is null)
-            {
-                Console.WriteLine(errorMessage);
-                continue;
-            }
-            if (validator != null && !validator(result))
-            {
-                Console.WriteLine(errorMessage);
-                continue;
-            }
-            return result;
-        }
-        }
 }
