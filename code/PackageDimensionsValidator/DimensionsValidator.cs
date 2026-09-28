@@ -1,27 +1,27 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
-
 namespace BeginCsh.PackageDimensionsValidator;
 
-public sealed record ExceedanceInfo(string name, double itemsize, double limit);
+public sealed record ExceedanceInfo(string name, double itemsize, double limit)
+{
+    public double excess => itemsize - limit;
+};
 
 public static class DimensionsValidator
 {
-    public static IReadOnlyList<ExceedanceInfo> ValidateDimensions(HandleItem handle)
+    public static IReadOnlyList<ExceedanceInfo> ValidateDimensions(HandleItem handle, List<ExceedanceInfo> exceedances)
     {
-        var exceedances = new List<ExceedanceInfo>();
+        //var exceedances = new List<ExceedanceInfo>();
 
         if (handle.length > HandleItem.BoxLength)
         {
-            exceedances.Add(new("Длина", handle.length, HandleItem.BoxLength));
+            exceedances.Add(new("длине", handle.length, HandleItem.BoxLength));
         }
-        else if (handle.width > HandleItem.BoxWidth)
+        if (handle.width > HandleItem.BoxWidth)
         {
-            exceedances.Add(new("Ширина", handle.width, HandleItem.BoxWidth));
+            exceedances.Add(new("ширине", handle.width, HandleItem.BoxWidth));
         }
-        else if (handle.heigth > HandleItem.BoxHeigth)
+        if (handle.heigth > HandleItem.BoxHeigth)
         {
-            exceedances.Add(new("Высота", handle.heigth, HandleItem.BoxHeigth));
+            exceedances.Add(new("высоте", handle.heigth, HandleItem.BoxHeigth));
         }
 
         return exceedances;
