@@ -6,5 +6,7 @@ public static class PackageDimensionsPrinter
     public static HandleItem ReadHandlesDimensions()
     {
         double handleLength;
+        //Продолжить писать валидацию черещ инпутэкзам
+        //Удалить лишние ветки гит
     }
 }
