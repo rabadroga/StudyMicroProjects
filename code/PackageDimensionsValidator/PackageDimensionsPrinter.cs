@@ -29,6 +29,22 @@ public static class PackageDimensionsPrinter
             {
                 Console.WriteLine($"Превышение по {ex.name} в размере: {ex.excess} мм");
             }
-        }
+
+            Console.WriteLine("Желаете проверить возможность переукладки вашей ручки? \n [Enter] для продолжения или любая другая клавиша для отмены");
+            ConsoleKeyInfo keyInput = Console.ReadKey();
+            if (keyInput.Key == ConsoleKey.Enter)
+            {
+                var rotateExceedances = new List<ExceedanceInfo>();
+                DimensionsValidator.RotateTry(handle, rotateExceedances);
+
+                if (rotateExceedances is [])
+                {
+                    Console.WriteLine("Мебельная ручка уложена правильно и принята в доставку!");
+                    Console.WriteLine($"Параметры вашей ручки: {handle.length} мм X {handle.width} мм X {handle.heigth} мм");
+                } 
+                else Console.WriteLine("Переукалдка не дала результата");
+            }
+            else Console.WriteLine("Выход...");
     }
+}
 }
