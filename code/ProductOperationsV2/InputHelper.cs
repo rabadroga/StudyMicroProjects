@@ -1,8 +1,8 @@
-namespace BeginCsh.ProductOperationsV2;
+namespace BeginCsh.Base;
 using System.Globalization;
 
-public static class InputExam{
-public static T ExamInput<T> (string prompt, Func<T, bool>? validator = null, string errorMessage = "Вы ввели недопустимое значение")
+public static class InputHelper{
+public static T Prompt<T> (string prompt, Func<T, bool>? validator = null, string errorMessage = "Вы ввели недопустимое значение")
         where T: IParsable<T>
         {
         while (true)

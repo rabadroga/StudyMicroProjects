@@ -1,6 +1,7 @@
 namespace BeginCsh.ProductOperationsV2;
 using System;
 using System.Globalization;
+using BeginCsh.Base;
 
 public static class OrderReceiptPrinter
 {
