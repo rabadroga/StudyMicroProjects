@@ -2,7 +2,7 @@ namespace BeginCsh.PackageDimensionsValidator;
 
 public static class DimensionsValidator
 {
-    public static IReadOnlyList<ExceedanceInfo> ValidateDimensions(Dimensions handle, Dimensions box)
+    public static ValidationResult ValidateDimensions(Dimensions handle, Dimensions box)
     {
         var exceedances = new List<ExceedanceInfo>();
 
@@ -19,6 +19,15 @@ public static class DimensionsValidator
             exceedances.Add(new("высоте", handle.Height, box.Height));
         }
 
-        return exceedances;
+        if(exceedances is []) 
+        {
+            var fitResult = new ValidationResult(true, exceedances);
+            return fitResult;
+        }
+        else 
+        {
+            var fitResult = new ValidationResult(false, exceedances);
+            return fitResult;
+        }
     }
 }

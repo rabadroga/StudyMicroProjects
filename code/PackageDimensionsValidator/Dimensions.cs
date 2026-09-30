@@ -6,3 +6,4 @@ public sealed record ExceedanceInfo(string name, double itemsize, double limit)
 {
     public double excess => itemsize - limit;
 };
+public sealed record ValidationResult(bool IsFit, IReadOnlyList<ExceedanceInfo> Exceedances);
