@@ -3,11 +3,29 @@ using BeginCsh.PackageDimensionsValidator;
     {
     static void Main()
     {
-        HandleItem handle = PackageDimensionsPrinter.ReadHandlesDimensions();
-        var exceedances = new List<ExceedanceInfo>();
-        
-        DimensionsValidator.ValidateDimensions(handle, exceedances); //А вот как создается множество разных объектов рекорда, если их будут вызывать разные люди постоянно? Типо если будет создаваться база, они же не будут все как "handle"
-        PackageDimensionsPrinter.PrintValidation(handle, exceedances);
+        (Dimensions handle, Dimensions box) = PackageDimensionsPrinter.ReadDimensions();
+        IReadOnlyList<ExceedanceInfo> exceedances = DimensionsValidator.ValidateDimensions(handle, box);
+
+        if (exceedances is []) PackageDimensionsPrinter.PrintValidation(handle, box, exceedances);
+        else
+        {
+            PackageDimensionsPrinter.PrintWarning(handle, box, exceedances);
+
+            Console.WriteLine("Желаете проверить возможность переукладки вашей ручки? \n [Enter] для продолжения или любая другая клавиша для отмены");
+            ConsoleKeyInfo keyInput = Console.ReadKey();
+            if (keyInput.Key == ConsoleKey.Enter)
+            {
+                (Dimensions rotatedHandle, Dimensions rotatedBox) = ItemRotator.RotateTry(handle, box);
+                IReadOnlyList<ExceedanceInfo> rotatedExceedances = DimensionsValidator.ValidateDimensions(rotatedHandle, rotatedBox);
+
+                if (rotatedExceedances is [])
+                {
+                    PackageDimensionsPrinter.PrintValidation(rotatedHandle, rotatedBox, rotatedExceedances);
+                } 
+                else Console.WriteLine("Переукалдка не дала результата");
+            }
+            else Console.WriteLine("Выход...");
+        }
     }
 
     }

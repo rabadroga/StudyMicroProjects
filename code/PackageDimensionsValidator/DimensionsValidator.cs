@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+
 namespace BeginCsh.PackageDimensionsValidator;
 
 public sealed record ExceedanceInfo(string name, double itemsize, double limit)
@@ -7,35 +9,38 @@ public sealed record ExceedanceInfo(string name, double itemsize, double limit)
 
 public static class DimensionsValidator
 {
-    public static IReadOnlyList<ExceedanceInfo> ValidateDimensions(HandleItem handle, List<ExceedanceInfo> exceedances)
+    public static IReadOnlyList<ExceedanceInfo> ValidateDimensions(Dimensions handle, Dimensions box)
     {
-        //ExceedanceInfo[] exceedaances;
+        var exceedances = new List<ExceedanceInfo>();
 
-        if (handle.length > HandleItem.BoxLength)
+        if (handle.Length > box.Length)
         {
-            exceedances.Add(new("длине", handle.length, HandleItem.BoxLength));
+            exceedances.Add(new("длине", handle.Length, box.Length));
         }
-        if (handle.width > HandleItem.BoxWidth)
+        if (handle.Width > box.Width)
         {
-            exceedances.Add(new("ширине", handle.width, HandleItem.BoxWidth));
+            exceedances.Add(new("ширине", handle.Width, box.Width));
         }
-        if (handle.heigth > HandleItem.BoxHeigth)
+        if (handle.Height > box.Height)
         {
-            exceedances.Add(new("высоте", handle.heigth, HandleItem.BoxHeigth));
+            exceedances.Add(new("высоте", handle.Height, box.Height));
         }
 
         return exceedances;
     }
 
-    public static IReadOnlyList<ExceedanceInfo> RotateTry(HandleItem handle, List<ExceedanceInfo> rotateExceedances)
+    //мб стоит закинуть это в отдельный класс. Это же не валидатор, а крутитель
+    public static (Dimensions rotatedHandle, Dimensions rotatedBox) RotateTry(Dimensions handle, Dimensions box)
     {
-        double[] rotation = [handle.length, handle.width, handle.heigth];
-        Array.Sort(rotation);
-        Array.Reverse(rotation);
+        double[] hRotated = [handle.Length, handle.Width, handle.Height];
+        Array.Sort(hRotated);
+        Array.Reverse(hRotated);
+        double[] bRotated = [box.Length, box.Width, box.Height];
+        Array.Sort(bRotated);
+        Array.Reverse(bRotated);
           
-        var rotatedHandle = new HandleItem(rotation[0], rotation[1], rotation[2]);
-        ValidateDimensions(rotatedHandle, rotateExceedances);
-        return rotateExceedances;
+        var rotatedHandle = new Dimensions(hRotated[0], hRotated[1], hRotated[2]);
+        var rotatedBox = new Dimensions(bRotated [0], bRotated [1], bRotated [2]);
+        return (rotatedHandle, rotatedBox);
     }
-    //Здесь будет метод поворота для влезания
 }
