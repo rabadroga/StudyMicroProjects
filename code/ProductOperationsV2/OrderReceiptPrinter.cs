@@ -1,15 +1,16 @@
 namespace BeginCsh.ProductOperationsV2;
 using System;
 using System.Globalization;
+using BeginCsh.Base;
 
 public static class OrderReceiptPrinter
 {
     //Этот класс включает в себя прием и вывод инфы, он не делает никаких расчетов
     public static Order ReadOrder()
     {
-        string articleRaw = InputExam.ExamInput<string> ("Введите артикул товара:");
-        int quantityRaw = InputExam.ExamInput<int> ("Введите количество товара", q => q > 0);
-        decimal priceRaw = InputExam.ExamInput<decimal> ("Введите цену товара: ", p => p > 0);
+        string articleRaw = InputHelper.Prompt<string> ("Введите артикул товара:");
+        int quantityRaw = InputHelper.Prompt<int> ("Введите количество товара", q => q > 0);
+        decimal priceRaw = InputHelper.Prompt<decimal> ("Введите цену товара: ", p => p > 0);
 
         var order = new Order(articleRaw, quantityRaw, priceRaw);
 

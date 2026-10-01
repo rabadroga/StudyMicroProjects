@@ -1,10 +1,31 @@
-using BeginCsh.ProductOperationsV2;
+using BeginCsh.PackageDimensionsValidator;
     static class Program
     {
     static void Main()
     {
-        Order order = OrderReceiptPrinter.ReadOrder();
-        OrderReceiptPrinter.PrintOrder(order);
+        (Dimensions handle, Dimensions box) = PackageDimensionsPrinter.ReadDimensions();
+        ValidationResult fitResult = DimensionsValidator.ValidateDirect(handle, box);
+
+        if (fitResult.IsFit) PackageDimensionsPrinter.PrintValidation(handle, box);
+        else
+        {
+            PackageDimensionsPrinter.PrintWarning(handle, box, fitResult);
+
+            Console.WriteLine("Желаете проверить возможность переукладки вашей ручки? \n [Enter] для продолжения или любая другая клавиша для отмены");
+            ConsoleKeyInfo keyInput = Console.ReadKey();
+            if (keyInput.Key == ConsoleKey.Enter)
+            {
+                ValidationResult rotatedFitResult = DimensionsValidator.ValidateWithRotation(handle, box);
+
+                if (rotatedFitResult.IsFit)
+                {
+                    PackageDimensionsPrinter.PrintValidation(handle, box);
+                } 
+                else Console.WriteLine("Переукладка не дала результата");
+            }
+            else Console.WriteLine("Выход...");
+        }
+        //потом закомменчу этот код и вставлю в текстовый файл в папке микропроекта для того, чтобы запустить его сразу, если нужно будет (в програм всегда разные коды для запуска же)
     }
 
     }
