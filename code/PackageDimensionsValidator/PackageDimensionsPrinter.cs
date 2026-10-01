@@ -24,6 +24,7 @@ public static class PackageDimensionsPrinter
     {
             Console.WriteLine("Мебельная ручка принята в доставку!");
             Console.WriteLine($"Параметры вашей ручки: {handle.Length} мм X {handle.Width} мм X {handle.Height} мм");
+            Console.WriteLine($"Габариты коробки: {box.Length} x {box.Width} x {box.Height} мм");
     }
 
     public static void PrintWarning(Dimensions handle, Dimensions box, ValidationResult fitResult)

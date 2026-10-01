@@ -22,7 +22,7 @@ public static class DimensionsValidator
         return new ValidationResult(exceedances.Count == 0, exceedances);
     }
 
-    public static (Dimensions rotatedHandle, Dimensions rotatedBox) ValidateWithRotation(Dimensions handle, Dimensions box)
+    public static ValidationResult ValidateWithRotation(Dimensions handle, Dimensions box)
     {
         double[] hRotated = [handle.Length, handle.Width, handle.Height];
         Array.Sort(hRotated);
@@ -31,8 +31,10 @@ public static class DimensionsValidator
         Array.Sort(bRotated);
         Array.Reverse(bRotated);
           
-        var rotatedHandle = new Dimensions(hRotated[0], hRotated[1], hRotated[2]);
-        var rotatedBox = new Dimensions(bRotated [0], bRotated [1], bRotated [2]);
-        return (rotatedHandle, rotatedBox);
+        return ValidateDirect
+        (
+            new Dimensions(hRotated[0], hRotated[1], hRotated[2]), 
+            new Dimensions(bRotated[0], bRotated[1], bRotated[2])
+        );
     }
 }

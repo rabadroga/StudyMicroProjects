@@ -15,12 +15,11 @@ using BeginCsh.PackageDimensionsValidator;
             ConsoleKeyInfo keyInput = Console.ReadKey();
             if (keyInput.Key == ConsoleKey.Enter)
             {
-                (Dimensions rotatedHandle, Dimensions rotatedBox) = DimensionsValidator.ValidateWithRotation(handle, box);
-                ValidationResult rotatedFitResult = DimensionsValidator.ValidateDirect(rotatedHandle, rotatedBox);
+                ValidationResult rotatedFitResult = DimensionsValidator.ValidateWithRotation(handle, box);
 
                 if (rotatedFitResult.IsFit)
                 {
-                    PackageDimensionsPrinter.PrintValidation(rotatedHandle, box);
+                    PackageDimensionsPrinter.PrintValidation(handle, box);
                 } 
                 else Console.WriteLine("Переукладка не дала результата");
             }
