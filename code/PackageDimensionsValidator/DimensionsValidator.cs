@@ -2,7 +2,7 @@ namespace BeginCsh.PackageDimensionsValidator;
 
 public static class DimensionsValidator
 {
-    public static ValidationResult ValidateDimensions(Dimensions handle, Dimensions box)
+    public static ValidationResult ValidateDirect(Dimensions handle, Dimensions box)
     {
         var exceedances = new List<ExceedanceInfo>();
 
@@ -19,15 +19,20 @@ public static class DimensionsValidator
             exceedances.Add(new("высоте", handle.Height, box.Height));
         }
 
-        if(exceedances is []) 
-        {
-            var fitResult = new ValidationResult(true, exceedances);
-            return fitResult;
-        }
-        else 
-        {
-            var fitResult = new ValidationResult(false, exceedances);
-            return fitResult;
-        }
+        return new ValidationResult(exceedances.Count == 0, exceedances);
+    }
+
+    public static (Dimensions rotatedHandle, Dimensions rotatedBox) ValidateWithRotation(Dimensions handle, Dimensions box)
+    {
+        double[] hRotated = [handle.Length, handle.Width, handle.Height];
+        Array.Sort(hRotated);
+        Array.Reverse(hRotated);
+        double[] bRotated = [box.Length, box.Width, box.Height];
+        Array.Sort(bRotated);
+        Array.Reverse(bRotated);
+          
+        var rotatedHandle = new Dimensions(hRotated[0], hRotated[1], hRotated[2]);
+        var rotatedBox = new Dimensions(bRotated [0], bRotated [1], bRotated [2]);
+        return (rotatedHandle, rotatedBox);
     }
 }

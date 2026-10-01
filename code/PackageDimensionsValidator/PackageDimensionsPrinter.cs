@@ -8,14 +8,14 @@ public static class PackageDimensionsPrinter
     {
         double handleLength = InputHelper.Prompt<double>("Введите длину ручки (мм): ", l => l > 0 && l <= 2000, "Недопустимый размер"); //Думал сделать отдельное сообщение для превышения длины, но как будто это будет скорее лишней работой
         double handleWidth = InputHelper.Prompt<double>("Введите ширину ручки (мм): ", w => w > 0 && w <= 2000, "Недопустимый размер");
-        double handleHeith = InputHelper.Prompt<double>("Введите высоту ручки (мм): ", h => h > 0 && h <= 2000, "Недопустимый размер");
+        double handleHeight = InputHelper.Prompt<double>("Введите высоту ручки (мм): ", h => h > 0 && h <= 2000, "Недопустимый размер");
 
         double boxLength = InputHelper.Prompt<double>("Введите длину коробки (мм): ", l => l > 0 && l <= 3000, "Недопустимый размер");
         double boxWidth = InputHelper.Prompt<double>("Введите ширину коробки (мм): ", w => w > 0 && w <= 3000, "Недопустимый размер");
-        double boxHeith = InputHelper.Prompt<double>("Введите высоту коробки (мм): ", h => h > 0 && h <= 3000, "Недопустимый размер");
+        double boxHeight = InputHelper.Prompt<double>("Введите высоту коробки (мм): ", h => h > 0 && h <= 3000, "Недопустимый размер");
 
-        var handle = new Dimensions(handleLength,handleWidth, handleHeith);
-        var box = new Dimensions(boxLength, boxWidth, boxHeith);
+        var handle = new Dimensions(handleLength, handleWidth, handleHeight);
+        var box = new Dimensions(boxLength, boxWidth, boxHeight);
         return (handle, box);
     }
 
@@ -33,7 +33,7 @@ public static class PackageDimensionsPrinter
 
             foreach (var ex in fitResult.Exceedances)
             {
-                Console.WriteLine($"Превышение по {ex.name} в размере: {ex.excess} мм");
+                Console.WriteLine($"Превышение по {ex.Name} в размере: {ex.Excess} мм");
             }
     }
     }

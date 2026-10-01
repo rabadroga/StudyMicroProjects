@@ -1,9 +1,8 @@
 namespace BeginCsh.PackageDimensionsValidator;
 
 public readonly record struct Dimensions (double Length, double Width, double Height);
-//Получается, этот рекорд небольшой и ему не нужна особая логика -- поэтому он структура?
-public sealed record ExceedanceInfo(string name, double itemsize, double limit)
+public sealed record ExceedanceInfo(string Name, double Itemsize, double Limit)
 {
-    public double excess => itemsize - limit;
+    public double Excess => Itemsize - Limit;
 };
 public sealed record ValidationResult(bool IsFit, IReadOnlyList<ExceedanceInfo> Exceedances);

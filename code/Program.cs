@@ -4,7 +4,7 @@ using BeginCsh.PackageDimensionsValidator;
     static void Main()
     {
         (Dimensions handle, Dimensions box) = PackageDimensionsPrinter.ReadDimensions();
-        ValidationResult fitResult = DimensionsValidator.ValidateDimensions(handle, box);
+        ValidationResult fitResult = DimensionsValidator.ValidateDirect(handle, box);
 
         if (fitResult.IsFit) PackageDimensionsPrinter.PrintValidation(handle, box);
         else
@@ -15,12 +15,12 @@ using BeginCsh.PackageDimensionsValidator;
             ConsoleKeyInfo keyInput = Console.ReadKey();
             if (keyInput.Key == ConsoleKey.Enter)
             {
-                (Dimensions rotatedHandle, Dimensions rotatedBox) = ItemRotator.RotateTry(handle, box);
-                ValidationResult rotatedFitResult = DimensionsValidator.ValidateDimensions(rotatedHandle, rotatedBox);
+                (Dimensions rotatedHandle, Dimensions rotatedBox) = DimensionsValidator.ValidateWithRotation(handle, box);
+                ValidationResult rotatedFitResult = DimensionsValidator.ValidateDirect(rotatedHandle, rotatedBox);
 
                 if (rotatedFitResult.IsFit)
                 {
-                    PackageDimensionsPrinter.PrintValidation(rotatedHandle, rotatedBox);
+                    PackageDimensionsPrinter.PrintValidation(rotatedHandle, box);
                 } 
                 else Console.WriteLine("Переукладка не дала результата");
             }
