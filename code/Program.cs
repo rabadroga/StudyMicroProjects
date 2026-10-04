@@ -1,31 +1,18 @@
-using BeginCsh.PackageDimensionsValidator;
+using BeginCsh.TieredPriceCalculator;
     static class Program
     {
     static void Main()
     {
-        (Dimensions handle, Dimensions box) = PackageDimensionsPrinter.ReadDimensions();
-        ValidationResult fitResult = DimensionsValidator.ValidateDirect(handle, box);
+        /*
+        Что по плану:
+        В рекорде уже вычисляются сабтотал, размер скидки, сумма и цена за штуку
+        Нужно понять размер скидки, создать градацию х2
+        И потом вывести
+        */
+        var quantity = InputReader.ReadInput();
+        var discount = FlatDiscountCalculator.CalculateDiscount(quantity);
+        var result = new PricingResult(quantity,discount);
 
-        if (fitResult.IsFit) PackageDimensionsPrinter.PrintValidation(handle, box);
-        else
-        {
-            PackageDimensionsPrinter.PrintWarning(handle, box, fitResult);
-
-            Console.WriteLine("Желаете проверить возможность переукладки вашей ручки? \n [Enter] для продолжения или любая другая клавиша для отмены");
-            ConsoleKeyInfo keyInput = Console.ReadKey();
-            if (keyInput.Key == ConsoleKey.Enter)
-            {
-                ValidationResult rotatedFitResult = DimensionsValidator.ValidateWithRotation(handle, box);
-
-                if (rotatedFitResult.IsFit)
-                {
-                    PackageDimensionsPrinter.PrintValidation(handle, box);
-                } 
-                else Console.WriteLine("Переукладка не дала результата");
-            }
-            else Console.WriteLine("Выход...");
-        }
-        //потом закомменчу этот код и вставлю в текстовый файл в папке микропроекта для того, чтобы запустить его сразу, если нужно будет (в програм всегда разные коды для запуска же)
+        Console.WriteLine(OutputPrinter.PrintOutput(result));
     }
-
     }
