@@ -10,7 +10,7 @@ using BeginCsh.TieredPriceCalculator;
         И потом вывести
         */
         var quantity = InputReader.ReadInput();
-        var discount = FlatDiscountCalculator.CalculateDiscount(quantity);
+        var discount = DiscountCalculator.CalculateFlatDiscount(quantity);
         var result = new PricingResult(quantity,discount);
 
         Console.WriteLine(OutputPrinter.PrintOutput(result));
