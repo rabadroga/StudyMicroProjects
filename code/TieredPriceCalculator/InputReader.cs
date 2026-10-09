@@ -1,6 +1,5 @@
 namespace BeginCsh.TieredPriceCalculator;
 
-using System.Runtime.InteropServices;
 using BeginCsh.Base;
 
 public static class InputReader
