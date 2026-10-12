@@ -13,6 +13,6 @@ public static class InputReader
     {
         Console.WriteLine("Введите промокод или оставьте поле пустым: ");
         string? promocode = Console.ReadLine();
-        return promocode; //Я все не могу точно понять, куда мне внести проверку промокода -- сюда или в программ?
+        return promocode;
     }
 }

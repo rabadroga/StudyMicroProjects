@@ -2,58 +2,60 @@ namespace BeginCsh.TieredPriceCalculator;
 
 public static class DiscountCalculator
 {
-    public static readonly (int Capacity, decimal DiscountRate)[] progressiveTiers =
+    const decimal DefaultBasePrice = 1500m; 
+    const decimal MaxDiscountCap = 0.25m;
+    private static readonly (int Capacity, decimal DiscountRate)[] progressiveTiers =
         [
             (49, 0.00m),
             (150, 0.05m),
             (300, 0.10m),
             (int.MaxValue, 0.18m)
         ];
-    public static readonly (int FlatCapacity, decimal FlatDiscountRate)[] FlatDiscountTiers =
+    private static readonly (int FlatCapacity, decimal FlatDiscountRate)[] flatDiscountTiers =
         [
-            (500, 0.18m),
+            (50, 0.05m),
             (200, 0.10m),
-            (50, 0.05m)
+            (500, 0.18m),
         ];
-    private static decimal validatePromocode(string? promocode)
+    private static decimal ValidatePromoCode(string? promoCode)
     {
         decimal discountRate = 0m;
                 
-        switch (promocode)
+        switch (promoCode)
             {
                 case var s when string.Equals(s, "LOYALTY", StringComparison.OrdinalIgnoreCase):  //мб стоит потом реализовать это тоже в enum, прям напрашивается. И еще есть ощущение, что этой логики здесь быть не должно, но это не точно
                 discountRate += 0.03m;
                 break;
 
-                case var s when string.IsNullOrWhiteSpace(s): //решил оставить, чтобы не высвечивалось предупреждение лишний раз
-                break;
+                /*case var s when string.IsNullOrWhiteSpace(s): //решил оставить, чтобы не высвечивалось предупреждение лишний раз
+                break;*/
 
                 default:
-                Console.WriteLine("Введен недействительный промокод!");
                 break;
             }
 
         return discountRate;
     }
-    public static PricingResult CalculateFlatDiscount(int quantity, string? promocode = null, decimal basePrice = 1500m)
+    public static PricingResult CalculateFlatDiscount(int quantity, string? promoCode = null, decimal basePrice = DefaultBasePrice)
     {
-        decimal discountRate = validatePromocode(promocode);
-        foreach ((int FC, decimal FDR) in FlatDiscountTiers)
+        decimal discountRate = ValidatePromoCode(promoCode);
+        /*foreach ((int FC, decimal FDR) in FlatDiscountTiers)
         {
             if (quantity >= FC)
             {
                 discountRate += FDR;
+                break;
             }
-        }
-        /*discountRate += quantity switch
+        }*/
+        discountRate += quantity switch
             {
              >= 500 => 0.18m,
              >= 200 => 0.10m,
              >= 50 => 0.05m,
              >  0 => 0m,
              _ => throw new ArgumentOutOfRangeException(nameof(quantity), "Недопустимое количество")
-            };*/
-        discountRate = Math.Min(discountRate, 0.25m);
+            };
+        discountRate = Math.Min(discountRate, MaxDiscountCap);
 
         decimal subtotal = decimal.Round(quantity * basePrice, 2, MidpointRounding.AwayFromZero);
         decimal discountAmount = decimal.Round(subtotal * discountRate, 2, MidpointRounding.AwayFromZero);
@@ -62,10 +64,10 @@ public static class DiscountCalculator
 
         return new PricingResult(quantity, basePrice, discountRate, subtotal, discountAmount, totalPrice, effectiveUnitPrice);
     }
-    public static (int plusQuantity, decimal savedMoney)? CheckWholesaleAnomaly(int quantity)
+    public static (int AdditionalQuantity, decimal SavedMoney)? CheckWholesaleAnomaly(int quantity)
     {
         int upperLimitQuantity = 0;
-        foreach ((int FC, _) in FlatDiscountTiers)
+        foreach ((int FC, _) in flatDiscountTiers)
         {
             if (quantity < FC) 
             {
@@ -82,15 +84,18 @@ public static class DiscountCalculator
             {
               return
               (
-              plusQuantity: upperLimitQuantity - quantity,
-              savedMoney: currentQuantityResult.TotalPrice - upperLimitQuantityResult.TotalPrice
+              AdditionalQuantity: upperLimitQuantity - quantity,
+              SavedMoney: currentQuantityResult.TotalPrice - upperLimitQuantityResult.TotalPrice
               );
             } else return null;
     }
-    public static PricingResult CalculateProgressiveDiscount(int quantity,  string? promocode = null, decimal basePrice = 1500m)
+    public static PricingResult CalculateProgressiveDiscount(int quantity,  string? promoCode = null, decimal basePrice = DefaultBasePrice)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(basePrice);
+
         decimal subtotal = decimal.Round(quantity * basePrice, 2, MidpointRounding.AwayFromZero);
-        int tempQuantity = quantity; //до этого я сам додумался))
+        int tempQuantity = quantity;
         decimal discountAmount = 0m;
 
         foreach((int C, decimal DR) in progressiveTiers)
@@ -102,10 +107,10 @@ public static class DiscountCalculator
             tempQuantity -= currentQuantity;
         }
 
-        decimal promoDiscountRate = validatePromocode(promocode);
+        decimal promoDiscountRate = ValidatePromoCode(promoCode);
         decimal promoDiscountAmount = subtotal * promoDiscountRate;
         discountAmount += promoDiscountAmount;
-        discountAmount = Math.Min(discountAmount, subtotal*0.25m);
+        discountAmount = Math.Min(discountAmount, subtotal*MaxDiscountCap);
 
         decimal discountRate = discountAmount / subtotal;
         discountAmount = decimal.Round(discountAmount, 2, MidpointRounding.AwayFromZero);
@@ -113,12 +118,5 @@ public static class DiscountCalculator
         decimal effectiveUnitPrice = decimal.Round(totalPrice / quantity, 2, MidpointRounding.AwayFromZero);
 
         return new PricingResult(quantity, basePrice, discountRate, subtotal, discountAmount, totalPrice, effectiveUnitPrice);
-        //я тут немного запутался в округлениях, как будто лучше все посчитать точно и только потом округлять, чтобы сохранить точные значения на будущее, на потенциальную логику. Мб стоит реализовать округление в самом рекорде? типо, копии всех значений RoundedSubtotal и тд...
-        //да и в целом этот метод оказался каким-то замудренным для меня, я как будто нормально его в памяти не отложил
     }
 }
-
-//Далее: создать метод парадокса оптовика
-//       переписать АутпутПринтер
-//      переписать Програм
-//ревью

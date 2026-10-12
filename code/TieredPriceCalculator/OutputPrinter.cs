@@ -2,25 +2,25 @@ namespace BeginCsh.TieredPriceCalculator;
 
 public static class OutputPrinter
 {
-    public static void PrintComparisonReport(PricingResult flat, PricingResult progressive)
+    public static void PrintComparisonReport(PricingResult flatResult, PricingResult progressiveResult)
     {
         Console.WriteLine("=======================================================================");
         Console.WriteLine("                    СРАВНИТЕЛЬНЫЙ ОТЧЕТ РАСЧЕТОВ                       ");
         Console.WriteLine("=======================================================================");
         Console.WriteLine($"| {"Параметр",-28} | {"Flat (Фикс.)",16} | {"Progressive",16} |");
         Console.WriteLine("|------------------------------|------------------|------------------|");
-        Console.WriteLine($"| {"Количество (Quantity)",-28} | {flat.Quantity,16} | {progressive.Quantity,16} |");
-        Console.WriteLine($"| {"Базовая цена (BasePrice)",-28} | {flat.BasePrice,16:C2} | {progressive.BasePrice,16:C2} |");
-        Console.WriteLine($"| {"Сумма без скидки (Subtotal)",-28} | {flat.Subtotal,16:C2} | {progressive.Subtotal,16:C2} |");
-        Console.WriteLine($"| {"Ставка скидки (DiscountRate)",-28} | {flat.DiscountRate,15:P2} | {progressive.DiscountRate,15:P2} |");
-        Console.WriteLine($"| {"Сумма скидки (DiscountAmount)",-28} | {flat.DiscountAmount,16:C2} | {progressive.DiscountAmount,16:C2} |");
-        Console.WriteLine($"| {"ИТОГО (TotalPrice)",-28} | {flat.TotalPrice,16:C2} | {progressive.TotalPrice,16:C2} |");
-        Console.WriteLine($"| {"Эфф. цена/шт (EffectiveUnit)",-28} | {flat.EffectiveUnitPrice,16:C4} | {progressive.EffectiveUnitPrice,16:C4} |");
+        Console.WriteLine($"| {"Количество (Quantity)",-28} | {flatResult.Quantity,16} | {progressiveResult.Quantity,16} |");
+        Console.WriteLine($"| {"Базовая цена (BasePrice)",-28} | {flatResult.BasePrice,16:C2} | {progressiveResult.BasePrice,16:C2} |");
+        Console.WriteLine($"| {"Сумма без скидки (Subtotal)",-28} | {flatResult.Subtotal,16:C2} | {progressiveResult.Subtotal,16:C2} |");
+        Console.WriteLine($"| {"Ставка скидки (DiscountRate)",-28} | {flatResult.DiscountRate,15:P2} | {progressiveResult.DiscountRate,15:P2} |");
+        Console.WriteLine($"| {"Сумма скидки (DiscountAmount)",-28} | {flatResult.DiscountAmount,16:C2} | {progressiveResult.DiscountAmount,16:C2} |");
+        Console.WriteLine($"| {"ИТОГО (TotalPrice)",-28} | {flatResult.TotalPrice,16:C2} | {progressiveResult.TotalPrice,16:C2} |");
+        Console.WriteLine($"| {"Эфф. цена/шт (EffectiveUnit)",-28} | {flatResult.EffectiveUnitPrice,16:C4} | {progressiveResult.EffectiveUnitPrice,16:C4} |");
         Console.WriteLine("=======================================================================");
     }
 
-    public static void PrintWholesaleAnomalyReport(int plusQuantity, decimal savedMoney)
+    public static void PrintWholesaleAnomalyReport(int additionalQuantity, decimal savedMoney)
     {
-        Console.WriteLine($"Внимание! Обнаружена аномалия оптовика. \n Приобретите еще {plusQuantity}, чтобы сэкономить {savedMoney}");
+        Console.WriteLine($"Внимание! Обнаружена аномалия оптовика. \n Приобретите еще {additionalQuantity}, чтобы сэкономить {savedMoney}");
     }
 }
