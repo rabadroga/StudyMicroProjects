@@ -4,6 +4,14 @@ public static class DiscountCalculator
 {
     const decimal DefaultBasePrice = 1500m; 
     const decimal MaxDiscountCap = 0.25m;
+
+    public enum CustomerTier
+    {
+        Retail, //без бонусов
+        Designer, //+5% к скидке
+        Wholesaler //особые пороги скидок
+    }
+
     private static readonly (int Capacity, decimal DiscountRate)[] progressiveTiers =
         [
             (49, 0.00m),
@@ -11,12 +19,26 @@ public static class DiscountCalculator
             (300, 0.10m),
             (int.MaxValue, 0.18m)
         ];
-    private static readonly (int FlatCapacity, decimal FlatDiscountRate)[] flatDiscountTiers =
+    private static readonly (int Capacity, decimal DiscountRate)[] progressiveWholesaleTiers =
+        [
+            (99, 0.00m),
+            (400, 0.10m),
+            (500, 0.20m),
+            (int.MaxValue, 0.25m)
+        ];
+    private static readonly (int fCapacity, decimal fDiscountRate)[] flatTiers =
         [
             (50, 0.05m),
             (200, 0.10m),
             (500, 0.18m),
         ];
+        private static readonly (int fCapacity, decimal fDiscountRate)[] flatWholesaleTiers =
+        [
+            (100, 0.10m),
+            (500, 0.20m),
+            (1000, 0.25m),
+        ];
+    
     private static decimal ValidatePromoCode(string? promoCode)
     {
         decimal discountRate = 0m;
@@ -36,18 +58,36 @@ public static class DiscountCalculator
 
         return discountRate;
     }
-    public static PricingResult CalculateFlatDiscount(int quantity, string? promoCode = null, decimal basePrice = DefaultBasePrice)
-    {
-        decimal discountRate = ValidatePromoCode(promoCode);
-        /*foreach ((int FC, decimal FDR) in FlatDiscountTiers)
+    private static decimal ValidateTierBonus(CustomerTier customerTier) => customerTier switch
         {
-            if (quantity >= FC)
+            CustomerTier.Designer => 0.05m,
+            CustomerTier.Retail or CustomerTier.Wholesaler => 0m,
+            _ => throw new ArgumentOutOfRangeException(nameof(customerTier), $"Необработанный тип: {customerTier}")
+        };
+    public static PricingResult CalculateFlatDiscount(int quantity, CustomerTier customerTier = CustomerTier.Retail, string? promoCode = null, decimal basePrice = DefaultBasePrice)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(basePrice);
+
+        decimal discountRate = ValidatePromoCode(promoCode) 
+                             + ValidateTierBonus(customerTier); //Или лучше 2 отдельные строки?
+
+        switch (customerTier)
+        {
+            case CustomerTier.Wholesaler:
+            discountRate += quantity switch
             {
-                discountRate += FDR;
-                break;
-            }
-        }*/
-        discountRate += quantity switch
+                //Этот массив связан с массивом проверки аномалии оптовика
+                >= 1000 => 0.25m,
+                >= 500 => 0.20m,
+                >= 100 => 0.10m,
+                > 0 => 0m,
+                _ => throw new ArgumentOutOfRangeException(nameof(quantity), "Недопустимое количество")
+            };
+            break;
+
+            case CustomerTier.Retail or CustomerTier.Designer:
+            discountRate += quantity switch
             {
              >= 500 => 0.18m,
              >= 200 => 0.10m,
@@ -55,8 +95,13 @@ public static class DiscountCalculator
              >  0 => 0m,
              _ => throw new ArgumentOutOfRangeException(nameof(quantity), "Недопустимое количество")
             };
-        discountRate = Math.Min(discountRate, MaxDiscountCap);
+            break;
 
+            default: throw new ArgumentOutOfRangeException(nameof(customerTier), $"Необработанный тип: {customerTier}");
+            //Я не стал делать if, потому что оставил прицел на будущее расширение тиров
+        }
+        
+        discountRate = Math.Min(discountRate, MaxDiscountCap);
         decimal subtotal = decimal.Round(quantity * basePrice, 2, MidpointRounding.AwayFromZero);
         decimal discountAmount = decimal.Round(subtotal * discountRate, 2, MidpointRounding.AwayFromZero);
         decimal totalPrice = subtotal - discountAmount;
@@ -64,10 +109,51 @@ public static class DiscountCalculator
 
         return new PricingResult(quantity, basePrice, discountRate, subtotal, discountAmount, totalPrice, effectiveUnitPrice);
     }
-    public static (int AdditionalQuantity, decimal SavedMoney)? CheckWholesaleAnomaly(int quantity)
+    public static PricingResult CalculateProgressiveDiscount(int quantity, CustomerTier customerTier = CustomerTier.Retail,  string? promoCode = null, decimal basePrice = DefaultBasePrice)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(basePrice);
+
+        decimal subtotal = quantity * basePrice;
+        int tempQuantity = quantity;
+        decimal discountAmount = 0m;
+        decimal bonusRate = ValidateTierBonus(customerTier) + ValidatePromoCode(promoCode);;
+
+        var currentTier = customerTier switch
+        {
+            CustomerTier.Wholesaler => progressiveWholesaleTiers,
+            CustomerTier.Retail or CustomerTier.Designer => progressiveTiers,
+            _ => throw new ArgumentOutOfRangeException(nameof(customerTier), $"Необработанный тип: {customerTier}")
+        };
+        foreach((int C, decimal DR) in currentTier)
+        {
+            if (tempQuantity <= 0) break;
+
+            int currentQuantity = Math.Min(tempQuantity, C);
+            decimal bonusAndTierRate = Math.Min(bonusRate + DR, MaxDiscountCap);
+            discountAmount += basePrice * currentQuantity * bonusAndTierRate;
+            tempQuantity -= currentQuantity;
+        }
+        decimal discountRate = discountAmount / subtotal;
+        discountAmount = decimal.Round(discountAmount, 2, MidpointRounding.AwayFromZero);
+        subtotal = decimal.Round(subtotal, 2, MidpointRounding.AwayFromZero);
+        decimal totalPrice = subtotal - discountAmount;
+        decimal effectiveUnitPrice = decimal.Round(totalPrice / quantity, 2, MidpointRounding.AwayFromZero);
+
+        return new PricingResult(quantity, basePrice, discountRate, subtotal, discountAmount, totalPrice, effectiveUnitPrice);
+    }
+
+    public static (int AdditionalQuantity, decimal SavedMoney)? CheckWholesaleAnomaly(int quantity, CustomerTier customerTier = CustomerTier.Retail)
+    {
+        var currentTier = customerTier switch
+        {
+            CustomerTier.Wholesaler => flatWholesaleTiers,
+            CustomerTier.Retail or CustomerTier.Designer => flatTiers,
+            _ => throw new ArgumentOutOfRangeException(nameof(customerTier), $"Необработанный тип: {customerTier}")
+        };
         int upperLimitQuantity = 0;
-        foreach ((int FC, _) in flatDiscountTiers)
+
+        foreach ((int FC, _) in currentTier)
         {
             if (quantity < FC) 
             {
@@ -78,8 +164,8 @@ public static class DiscountCalculator
 
         if (upperLimitQuantity == 0) return null;
         
-        var currentQuantityResult = CalculateFlatDiscount(quantity);
-        var upperLimitQuantityResult = CalculateFlatDiscount(upperLimitQuantity);
+        var currentQuantityResult = CalculateFlatDiscount(quantity, customerTier);
+        var upperLimitQuantityResult = CalculateFlatDiscount(upperLimitQuantity, customerTier);
         if(currentQuantityResult.TotalPrice > upperLimitQuantityResult.TotalPrice)
             {
               return
@@ -88,35 +174,5 @@ public static class DiscountCalculator
               SavedMoney: currentQuantityResult.TotalPrice - upperLimitQuantityResult.TotalPrice
               );
             } else return null;
-    }
-    public static PricingResult CalculateProgressiveDiscount(int quantity,  string? promoCode = null, decimal basePrice = DefaultBasePrice)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
-        ArgumentOutOfRangeException.ThrowIfNegative(basePrice);
-
-        decimal subtotal = decimal.Round(quantity * basePrice, 2, MidpointRounding.AwayFromZero);
-        int tempQuantity = quantity;
-        decimal discountAmount = 0m;
-
-        foreach((int C, decimal DR) in progressiveTiers)
-        {
-            if (tempQuantity <= 0) break;
-
-            int currentQuantity = Math.Min(tempQuantity, C);
-            discountAmount += basePrice * currentQuantity * DR;
-            tempQuantity -= currentQuantity;
-        }
-
-        decimal promoDiscountRate = ValidatePromoCode(promoCode);
-        decimal promoDiscountAmount = subtotal * promoDiscountRate;
-        discountAmount += promoDiscountAmount;
-        discountAmount = Math.Min(discountAmount, subtotal*MaxDiscountCap);
-
-        decimal discountRate = discountAmount / subtotal;
-        discountAmount = decimal.Round(discountAmount, 2, MidpointRounding.AwayFromZero);
-        decimal totalPrice = subtotal - discountAmount;
-        decimal effectiveUnitPrice = decimal.Round(totalPrice / quantity, 2, MidpointRounding.AwayFromZero);
-
-        return new PricingResult(quantity, basePrice, discountRate, subtotal, discountAmount, totalPrice, effectiveUnitPrice);
     }
 }
