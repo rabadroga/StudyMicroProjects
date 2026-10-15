@@ -17,9 +17,9 @@ public static class InputReader
     }
     public static CustomerTier CustomerTierInput()
     {
-        CustomerTier customerTier = InputHelper.PromtEnum<CustomerTier>
+        CustomerTier customerTier = InputHelper.PromptEnum<CustomerTier>
         (
-            "Выберите свою категорию покупателя: \n 1 -- Розничный \n 2 -- Дизайнер \n 3 -- Оптовик"
+            "Выберите свою категорию покупателя: \n 0 -- Розничный \n 1 -- Дизайнер \n 2 -- Оптовик"
         );
         return customerTier;
     }

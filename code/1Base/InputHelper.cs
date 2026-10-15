@@ -1,6 +1,5 @@
 namespace BeginCsh.Base;
 using System.Globalization;
-using System.Runtime.ConstrainedExecution;
 
 public static class InputHelper{
 public static T Prompt<T> (string prompt, Func<T, bool>? validator = null, string errorMessage = "Вы ввели недопустимое значение")
@@ -31,7 +30,7 @@ public static T Prompt<T> (string prompt, Func<T, bool>? validator = null, strin
         }
         }
 
-public static TEnum PromtEnum<TEnum> (string prompt, Func<TEnum, bool>? validator = null, string errorMessage = "Недопустимое значение")
+public static TEnum PromptEnum<TEnum> (string prompt, Func<TEnum, bool>? validator = null, string errorMessage = "Недопустимое значение")
         where TEnum : struct, Enum
         {
             while (true)
