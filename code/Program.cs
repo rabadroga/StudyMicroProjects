@@ -1,31 +1,21 @@
-using BeginCsh.PackageDimensionsValidator;
-    static class Program
-    {
+using BeginCsh.TieredPriceCalculator;
+static class Program
+{
     static void Main()
     {
-        (Dimensions handle, Dimensions box) = PackageDimensionsPrinter.ReadDimensions();
-        ValidationResult fitResult = DimensionsValidator.ValidateDirect(handle, box);
+        //чекни InputHelper -- я его немного переписал и переместил
+        var quantity = InputReader.QuantityInput();
+        var promocode = InputReader.PromocodeInput();
+        var customerTier = InputReader.CustomerTierInput();
 
-        if (fitResult.IsFit) PackageDimensionsPrinter.PrintValidation(handle, box);
-        else
-        {
-            PackageDimensionsPrinter.PrintWarning(handle, box, fitResult);
+        var flatResult = DiscountCalculator.CalculateFlatDiscount(quantity, customerTier, promocode);
+        var progressiveResult = DiscountCalculator.CalculateProgressiveDiscount(quantity, customerTier, promocode);
+        var anomalyResult = DiscountCalculator.CheckWholesaleAnomaly(quantity, customerTier);
 
-            Console.WriteLine("Желаете проверить возможность переукладки вашей ручки? \n [Enter] для продолжения или любая другая клавиша для отмены");
-            ConsoleKeyInfo keyInput = Console.ReadKey();
-            if (keyInput.Key == ConsoleKey.Enter)
-            {
-                ValidationResult rotatedFitResult = DimensionsValidator.ValidateWithRotation(handle, box);
+        OutputPrinter.PrintComparisonReport(flatResult, progressiveResult, customerTier);
 
-                if (rotatedFitResult.IsFit)
-                {
-                    PackageDimensionsPrinter.PrintValidation(handle, box);
-                } 
-                else Console.WriteLine("Переукладка не дала результата");
-            }
-            else Console.WriteLine("Выход...");
-        }
-        //потом закомменчу этот код и вставлю в текстовый файл в папке микропроекта для того, чтобы запустить его сразу, если нужно будет (в програм всегда разные коды для запуска же)
+        if (anomalyResult is (int additionalQuantity, decimal savedMoney))
+            OutputPrinter.PrintWholesaleAnomalyReport(additionalQuantity, savedMoney);
+        //надо еще подумать, как правильно расчитывать объем работы, чтобы понять, когда я могу справедливо давать себе отдых до конца дня, если многое успел
     }
-
-    }
+}
