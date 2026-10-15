@@ -2,11 +2,12 @@ namespace BeginCsh.TieredPriceCalculator;
 
 public static class OutputPrinter
 {
-    public static void PrintComparisonReport(PricingResult flatResult, PricingResult progressiveResult)
+    public static void PrintComparisonReport(PricingResult flatResult, PricingResult progressiveResult, CustomerTier customerTier)
     {
         Console.WriteLine("=======================================================================");
         Console.WriteLine("                    СРАВНИТЕЛЬНЫЙ ОТЧЕТ РАСЧЕТОВ                       ");
         Console.WriteLine("=======================================================================");
+        Console.WriteLine($"Покупатель:   {customerTier}");
         Console.WriteLine($"| {"Параметр",-28} | {"Flat",16} | {"Progressive",16} |");
         Console.WriteLine("|------------------------------|------------------|------------------|");
         Console.WriteLine($"| {"Количество",-28} | {flatResult.Quantity,16} | {progressiveResult.Quantity,16} |");

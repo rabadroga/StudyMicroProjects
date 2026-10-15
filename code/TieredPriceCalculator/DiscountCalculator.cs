@@ -5,13 +5,6 @@ public static class DiscountCalculator
     const decimal DefaultBasePrice = 1500m; 
     const decimal MaxDiscountCap = 0.25m;
 
-    public enum CustomerTier
-    {
-        Retail, //без бонусов
-        Designer, //+5% к скидке
-        Wholesaler //особые пороги скидок
-    }
-
     private static readonly (int Capacity, decimal DiscountRate)[] progressiveTiers =
         [
             (49, 0.00m),
@@ -64,7 +57,7 @@ public static class DiscountCalculator
             CustomerTier.Retail or CustomerTier.Wholesaler => 0m,
             _ => throw new ArgumentOutOfRangeException(nameof(customerTier), $"Необработанный тип: {customerTier}")
         };
-    public static PricingResult CalculateFlatDiscount(int quantity, CustomerTier customerTier = CustomerTier.Retail, string? promoCode = null, decimal basePrice = DefaultBasePrice)
+    public static PricingResult CalculateFlatDiscount(int quantity, CustomerTier customerTier = CustomerTier.Retail, string? promoCode = null, decimal basePrice = DefaultBasePrice) //Стоит ли оставлять параметр енума со значением по умолчанию? По идее, он в любом случае будет не нулевой
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
         ArgumentOutOfRangeException.ThrowIfNegative(basePrice);

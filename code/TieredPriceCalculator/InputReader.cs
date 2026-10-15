@@ -15,4 +15,12 @@ public static class InputReader
         string? promocode = Console.ReadLine();
         return promocode;
     }
-}
+    public static CustomerTier CustomerTierInput()
+    {
+        CustomerTier customerTier = InputHelper.PromtEnum<CustomerTier>
+        (
+            "Выберите свою категорию покупателя: \n 1 -- Розничный \n 2 -- Дизайнер \n 3 -- Оптовик"
+        );
+        return customerTier;
+    }
+    }

@@ -3,6 +3,7 @@ using BeginCsh.TieredPriceCalculator;
     {
     static void Main()
     {
+        //чекни InputHelper -- я его немного переписал и переместил
         var quantity = InputReader.QuantityInput();
         var promocode = InputReader.PromocodeInput();
         var flatResult = DiscountCalculator.CalculateFlatDiscount(quantity, promocode);
