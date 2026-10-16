@@ -27,10 +27,10 @@ public static class DiscountCalculator
         ];
     private static readonly (int Capacity, decimal DiscountRate)[] flatWholesaleTiers =
     [
-        (100, 0.10m),
+            (100, 0.10m),
             (500, 0.20m),
             (1000, 0.25m),
-        ];
+    ];
 
     private static decimal ValidatePromoCode(string? promoCode)
     {
@@ -70,7 +70,7 @@ public static class DiscountCalculator
             case CustomerTier.Wholesaler:
                 discountRate += quantity switch
                 {
-                    //Этот массив связан с массивом проверки аномалии оптовика
+                    //Этот массив связан с массивом проверки аномалии оптовика | не сделал через один массив, потому что нужно было реализовать через switch expression
                     >= 1000 => 0.25m,
                     >= 500 => 0.20m,
                     >= 100 => 0.10m,
