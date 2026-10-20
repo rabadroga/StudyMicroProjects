@@ -1,6 +1,6 @@
 namespace BeginCsh.TieredPriceCalculator;
 
-public readonly record struct PricingResult
+public sealed record PricingResult
 (
     int Quantity,
     decimal BasePrice,
