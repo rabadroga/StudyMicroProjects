@@ -1,6 +1,6 @@
 namespace BeginCsh.WarehouseInventorySimulator;
 
-public sealed record WarehouseOperationLog
+public sealed record OperationLog
 (
     string Sku,
     OperationType OperationType,
@@ -9,8 +9,3 @@ public sealed record WarehouseOperationLog
     bool IsLowStock, //могу ли я вынести это в логику рекорда как лямбда выражение?
     DateTimeOffset DateTime
 );
-public enum OperationType //стоит ли выносить енум в отдельный файл?
-{
-    Shipment,
-    Restock
-}

@@ -5,8 +5,8 @@ public class Warehouse
     private readonly Dictionary<string, InventoryItem> _warehouseInventory = new();
     public IReadOnlyDictionary<string, InventoryItem> WarehouseInventory => _warehouseInventory;
 
-    private readonly List<WarehouseOperationLog> _logs = new();
-    public List<WarehouseOperationLog> Logs => _logs;
+    private readonly List<OperationLog> _logs = new();
+    public List<OperationLog> Logs => _logs;
 
     /*
     надо будет потом все реализовать в отдельном классе интпута -- ввод нового товара, операций с ним
@@ -37,17 +37,17 @@ public class Warehouse
 
         if (!_warehouseInventory.TryGetValue(sku, out var item))
         {
-            throw new KeyNotFoundException("Артикул не найден");
+            throw new KeyNotFoundException($"Артикул {sku} не найден");
         }
 
         DateTimeOffset dateTime = DateTimeOffset.UtcNow;
 
         item.Ship(amount);
 
-        var log = new WarehouseOperationLog
+        var log = new OperationLog
         (
             item.Sku,
-            OperationType.Shipment,
+            OperationType.Shipment, //это же не хардкод вот так напрямую забивать значение внутри метода?
             amount,
             item.Quantity,
             item.IsLowStock,
@@ -62,14 +62,14 @@ public class Warehouse
 
         if (!_warehouseInventory.TryGetValue(sku, out var item))
         {
-            throw new KeyNotFoundException("Артикул не найден");
+            throw new KeyNotFoundException($"Артикул {sku} не найден");
         }
 
         DateTimeOffset dateTime = DateTimeOffset.UtcNow;
 
         item.Restock(amount);
 
-        var log = new WarehouseOperationLog
+        var log = new OperationLog
         (
             item.Sku,
             OperationType.Restock,
