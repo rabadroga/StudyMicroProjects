@@ -19,7 +19,7 @@ public class Warehouse
     потом идет просто смена, он нажимает ввод, вывод товара
     и отдельная кнопка завершить смену
     */
-    public ItemCreationOutcome CreateItem(string sku, int quantity, int warningThreshold)
+    public CreationOutcome CreateItem(string sku, int quantity, int warningThreshold)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
@@ -27,13 +27,25 @@ public class Warehouse
 
         if (_warehouseInventory.ContainsKey(sku))
         {
-            return new ItemCreationOutcome.AlreadyExists(sku);
+            return new CreationOutcome.AlreadyExists(sku);
         }
 
         var item = new InventoryItem(sku, quantity, warningThreshold);
         _warehouseInventory.Add(sku, item);
 
-        return new ItemCreationOutcome.Success(item);
+        DateTimeOffset dateTime = DateTimeOffset.UtcNow;
+        var log = new OperationLog
+        (
+            sku,
+            OperationType.Creation,
+            quantity,
+            quantity,
+            item.IsLowStock,
+            dateTime
+        );
+        _logs.Add(log);
+
+        return new CreationOutcome.Success(log);
     }
 
     public ShipmentOutcome ShipItem(string sku, int amount)

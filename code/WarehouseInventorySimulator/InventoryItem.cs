@@ -12,7 +12,7 @@ public class InventoryItem
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(warningThreshold);
+        ArgumentOutOfRangeException.ThrowIfNegative(warningThreshold);
 
         Sku = sku;
         Quantity = quantity;
