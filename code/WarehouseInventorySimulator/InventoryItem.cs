@@ -22,6 +22,7 @@ public class InventoryItem
     public void Ship(int quantity)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
+        
         if (Quantity < quantity)
         {
             throw new InvalidOperationException("Недостаточное количество для списания!");
@@ -36,9 +37,4 @@ public class InventoryItem
         
         Quantity += quantity;
     }
-
-    /*
-    что такое discriminated union?
-    изучить словари
-    */
 }

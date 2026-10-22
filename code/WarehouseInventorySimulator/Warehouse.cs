@@ -6,7 +6,7 @@ public class Warehouse
     public IReadOnlyDictionary<string, InventoryItem> WarehouseInventory => _warehouseInventory;
 
     private readonly List<OperationLog> _logs = new();
-    public List<OperationLog> Logs => _logs;
+    public IReadOnlyList<OperationLog> Logs => _logs;
 
     /*
     надо будет потом все реализовать в отдельном классе интпута -- ввод нового товара, операций с ним
@@ -19,54 +19,68 @@ public class Warehouse
     потом идет просто смена, он нажимает ввод, вывод товара
     и отдельная кнопка завершить смену
     */
-    public InventoryItem CreateItem(string sku, int quantity, int warningThreshold)
-    {
-        var item = new InventoryItem(sku, quantity, warningThreshold);
-
-        if (!_warehouseInventory.TryAdd(sku, item))
-        {
-            throw new InvalidOperationException($"Артикул {sku} уже существует!");
-        }
-
-        return item;
-    }
-
-    public void ShipItem(string sku, int amount)
+    public ItemCreationOutcome CreateItem(string sku, int quantity, int warningThreshold)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentOutOfRangeException.ThrowIfNegative(quantity);
+        ArgumentOutOfRangeException.ThrowIfNegative(warningThreshold);
+
+        if (_warehouseInventory.ContainsKey(sku))
+        {
+            return new ItemCreationOutcome.AlreadyExists(sku);
+        }
+
+        var item = new InventoryItem(sku, quantity, warningThreshold);
+        _warehouseInventory.Add(sku, item);
+
+        return new ItemCreationOutcome.Success(item);
+    }
+
+    public ShipmentOutcome ShipItem(string sku, int amount)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
         if (!_warehouseInventory.TryGetValue(sku, out var item))
         {
-            throw new KeyNotFoundException($"Артикул {sku} не найден");
+            return new ShipmentOutcome.ItemNotFound(sku);
         }
 
+        if (amount > item.Quantity)
+        {
+            return new ShipmentOutcome.InsufficientStock(amount, item.Quantity);
+        }
+        
         DateTimeOffset dateTime = DateTimeOffset.UtcNow;
-
         item.Ship(amount);
 
         var log = new OperationLog
         (
             item.Sku,
-            OperationType.Shipment, //это же не хардкод вот так напрямую забивать значение внутри метода?
+            OperationType.Shipment,
             amount,
             item.Quantity,
             item.IsLowStock,
             dateTime
         );
         _logs.Add(log);
+
+        return new ShipmentOutcome.Success(log);
+        //не забыть про уведомление достижения порога предупреждения.
+            //по идее, реализовать несложно, за счет активного булевого поля, только вот не уверен куда: по идее, это просто предупреждение и думаю, что его нужно ввести уже в программ через проверку
     }
 
-    public void RestockItem(string sku, int amount)
+    public RestockmentOutcome RestockItem(string sku, int amount)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
         if (!_warehouseInventory.TryGetValue(sku, out var item))
         {
-            throw new KeyNotFoundException($"Артикул {sku} не найден");
+            return new RestockmentOutcome.ItemNotFound(sku);
         }
 
         DateTimeOffset dateTime = DateTimeOffset.UtcNow;
-
         item.Restock(amount);
 
         var log = new OperationLog
@@ -78,5 +92,8 @@ public class Warehouse
             item.IsLowStock,
             dateTime
         );
+        _logs.Add(log);
+
+        return new RestockmentOutcome.Success(log);
     }
 }
