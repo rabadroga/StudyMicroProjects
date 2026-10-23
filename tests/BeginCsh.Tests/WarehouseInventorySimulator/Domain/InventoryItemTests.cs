@@ -10,7 +10,7 @@ public class InventoryItemTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void InventoryItem_NullOrWhiteSpaceSku_ThrowsArgumentExeption(string? sku)
+    public void InventoryItem_NullOrWhiteSpaceSku_ThrowsArgumentException(string? sku)
     {
         Assert.ThrowsAny<ArgumentException>(() => new InventoryItem(sku!, 1, 1));
     }
@@ -18,7 +18,7 @@ public class InventoryItemTests
     [Theory]
     [InlineData(1, -1)]
     [InlineData(-1, 1)]
-    public void InventoryItem_NegativeQuantityOrWarningThreshold_ThrowsArgumentOutOfRangeExeption(int quantity, int warningThreshold)
+    public void InventoryItem_NegativeQuantityOrWarningThreshold_ThrowsArgumentOutOfRangeException(int quantity, int warningThreshold)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new InventoryItem("item-test", quantity, warningThreshold));
     }
@@ -33,6 +33,19 @@ public class InventoryItemTests
         item.Ship(amount);
 
         Assert.Equal(expected, item.Quantity);
+    }
+
+    [Theory]
+    [InlineData(10, 5, 2, false)]
+    [InlineData(10, 5, 5, true)]
+    [InlineData(10, 5, 6, true)]
+    public void IsLowStock_ValidAmount_CorrectStatusShowing(int quantity, int amount, int warningThreshold, bool isLowStock)
+    {
+        var item = new InventoryItem("item-test", quantity, warningThreshold);
+
+        item.Ship(amount);
+
+        Assert.Equal(isLowStock, item.IsLowStock);
     }
 
     [Theory]
