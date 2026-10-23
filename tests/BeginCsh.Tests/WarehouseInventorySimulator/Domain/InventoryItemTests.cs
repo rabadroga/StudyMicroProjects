@@ -6,6 +6,8 @@ public class InventoryItemTests
 {
     private static InventoryItem CreateItemWithQuantity(int quantity) => new InventoryItem("test-item", quantity, 0);
 
+    //нужно ли делать тест валидного создания item?
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]

@@ -25,6 +25,8 @@ public class Warehouse
         ArgumentOutOfRangeException.ThrowIfNegative(quantity);
         ArgumentOutOfRangeException.ThrowIfNegative(warningThreshold);
 
+        DateTimeOffset dateTime = DateTimeOffset.UtcNow;
+        
         if (_warehouseInventory.ContainsKey(sku))
         {
             return new CreationOutcome.AlreadyExists(sku);
@@ -33,7 +35,6 @@ public class Warehouse
         var item = new InventoryItem(sku, quantity, warningThreshold);
         _warehouseInventory.Add(sku, item);
 
-        DateTimeOffset dateTime = DateTimeOffset.UtcNow;
         var log = new OperationLog
         (
             sku,
