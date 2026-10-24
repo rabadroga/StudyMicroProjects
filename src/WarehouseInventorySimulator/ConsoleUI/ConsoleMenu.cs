@@ -7,8 +7,7 @@ public class ConsoleMenu
     private readonly Warehouse _warehouse;
     private bool _isShiftActive = true;
 
-    public ConsoleMenu(Warehouse warehouse) => _warehouse = warehouse; //а зачем так защищать?
-
+    public ConsoleMenu(Warehouse warehouse) => _warehouse = warehouse;
     public void Run()
     {
         OutputPrinter.PrintWelcome();
@@ -19,15 +18,15 @@ public class ConsoleMenu
             HandleChoice(choice);
         }
 
-        if(_warehouse.Logs.Count == 0)
+        if (_warehouse.Logs.Count == 0)
         {
             OutputPrinter.PrintEmptyLogReport();
         }
-
-        foreach(var log in _warehouse.Logs)
-        {
-            OutputPrinter.PrintLogReport(log);
-        }
+        else
+            foreach (var log in _warehouse.Logs)
+            {
+                OutputPrinter.PrintLogReport(log);
+            }
     }
 
     private void HandleChoice(ChoiceValue choice)

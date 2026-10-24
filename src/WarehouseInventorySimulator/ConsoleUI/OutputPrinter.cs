@@ -18,7 +18,7 @@ public static class OutputPrinter
         {
             case CreationOutcome.Success success:
                 Console.WriteLine($"Успешно создан товар {success.Log.Sku} с количеством {success.Log.Quantity} штук");
-                if(success.Log.IsLowStock) 
+                if (success.Log.IsLowStock)
                     PrintThresholdWarning();
                 break;
 
@@ -26,7 +26,7 @@ public static class OutputPrinter
                 Console.WriteLine($"Товар с артикулом {exists.Sku} уже существует!");
                 break;
 
-            default: throw new UnreachableException("Охвачены не все возможные исходы!"); //правильно же я обозначил проверку для того, что свитч охватывает все значения рекорда? Или это лучше реализовать в юнит тестах?
+            default: throw new UnreachableException("Охвачены не все возможные исходы!");
         }
     }
 
@@ -35,8 +35,8 @@ public static class OutputPrinter
         switch (outcome)
         {
             case ShipmentOutcome.Success success:
-                Console.WriteLine($"Успешно списано {success.Log.amount} штук у товара {success.Log.Sku}, остаток: {success.Log.Quantity} штук");
-                if(success.Log.IsLowStock) 
+                Console.WriteLine($"Успешно списано {success.Log.Amount} штук у товара {success.Log.Sku}, остаток: {success.Log.Quantity} штук");
+                if (success.Log.IsLowStock)
                     PrintThresholdWarning();
                 break;
 
@@ -57,7 +57,7 @@ public static class OutputPrinter
         switch (outcome)
         {
             case RestockmentOutcome.Success success:
-                Console.WriteLine($"Успешно пополнен товар {success.Log.Sku} на {success.Log.amount} штук, остаток: {success.Log.Quantity} штук");
+                Console.WriteLine($"Успешно пополнен товар {success.Log.Sku} на {success.Log.Amount} штук, остаток: {success.Log.Quantity} штук");
                 break;
 
             case RestockmentOutcome.ItemNotFound notFound:
@@ -73,18 +73,40 @@ public static class OutputPrinter
         switch (log.OperationType)
         {
             case OperationType.Creation:
-                Console.WriteLine($"--==-- \n Создание нового товара с артикулом: {log.Sku}. \n Текущее количество: {log.Quantity} штук \n время создания: {log.DateTime} \n --==--");
+                Console.WriteLine($"""
+                    --==--
+                    Создание нового товара: {log.Sku}
+                    Начальное количество: {log.Quantity} шт.
+                    Время: {log.DateTime:yyyy-MM-dd HH:mm:ss}
+                    --==--
+                    """);
                 break;
 
             case OperationType.Shipment:
-                Console.WriteLine($"--==-- \n Списание товара с артикулом: {log.Sku}. \n Списано: {log.amount} штук \n Остаток: {log.Quantity} штук \n Достигнут ли порог: {log.IsLowStock} \n время создания: {log.DateTime} \n --==--");
+                Console.WriteLine($"""
+                    --==--
+                    Списание товара: {log.Sku}
+                    Списано: {log.Amount} шт.
+                    Остаток: {log.Quantity} шт.
+                    Минимальный порог достигнут: {(log.IsLowStock ? "ДА" : "Нет")}
+                    Время: {log.DateTime:yyyy-MM-dd HH:mm:ss}
+                    --==--
+                    """);
                 break;
 
             case OperationType.Restock:
-                Console.WriteLine($"--==-- \n Пополнение товара с артикулом: {log.Sku}. \n Пополнено: {log.amount} штук \n Остаток: {log.Quantity} штук \n время создания: {log.DateTime} \n --==--");
+                Console.WriteLine($"""
+                    --==--
+                    Пополнение товара: {log.Sku}
+                    Пополнено: {log.Amount} шт.
+                    Остаток: {log.Quantity} шт.
+                    Время: {log.DateTime:yyyy-MM-dd HH:mm:ss}
+                    --==--
+                    """);
                 break;
 
-            default: throw new UnreachableException("Охвачены не все возможные исходы!");
+            default:
+                throw new UnreachableException("Охвачены не все возможные исходы!");
         }
     }
 

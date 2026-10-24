@@ -5,9 +5,15 @@ public static class InputReader
 {
     public static ChoiceValue ChoiceInput()
     {
-        var choice = InputHelper.PromptEnum<ChoiceValue>("Выберите пункт: : \n 1 -- Создание товара \n 2 -- Списание товара \n 3 -- Пополнение товара \n 0 -- Завершить смену");
+        const string prompt = """
+        Выберите пункт:
+        1 -- Создание товара
+        2 -- Списание товара
+        3 -- Пополнение товара
+        0 -- Завершить смену
+        """;
 
-        return choice;
+        return InputHelper.PromptEnum<ChoiceValue>(prompt);
     }
     public static string SkuInput()
     {
