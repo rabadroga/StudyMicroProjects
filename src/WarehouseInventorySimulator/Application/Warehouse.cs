@@ -2,23 +2,12 @@ namespace BeginCsh.WarehouseInventorySimulator;
 
 public class Warehouse
 {
-    private readonly Dictionary<string, InventoryItem> _warehouseInventory = new();
+    private readonly Dictionary<string, InventoryItem> _warehouseInventory = new(StringComparer.OrdinalIgnoreCase);
     public IReadOnlyDictionary<string, InventoryItem> WarehouseInventory => _warehouseInventory;
 
     private readonly List<OperationLog> _logs = new();
     public IReadOnlyList<OperationLog> Logs => _logs;
 
-    /*
-    надо будет потом все реализовать в отдельном классе интпута -- ввод нового товара, операций с ним
-    потом класс печати отчета смена и мб списка товаров и тд
-
-    А также реализовать консоль юи в плане небольшого меню, как в тг ботах --
-    у чела выходят сообщения, он нажимает нужные символы, чтобы выполнять команды
-    типо:
-    идет сначала пополнение, он вводит, потом может добавить еще и выйти из режима пополнения (скорее всего, это будет цикл в программ)
-    потом идет просто смена, он нажимает ввод, вывод товара
-    и отдельная кнопка завершить смену
-    */
     public CreationOutcome CreateItem(string sku, int quantity, int warningThreshold)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
@@ -79,8 +68,6 @@ public class Warehouse
         _logs.Add(log);
 
         return new ShipmentOutcome.Success(log);
-        //не забыть про уведомление достижения порога предупреждения.
-            //по идее, реализовать несложно, за счет активного булевого поля, только вот не уверен куда: по идее, это просто предупреждение и думаю, что его нужно ввести уже в программ через проверку
     }
 
     public RestockmentOutcome RestockItem(string sku, int amount)
