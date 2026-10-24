@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/beginCsh.Tests/beginCsh.Tests.csproj" />
+  </Folder>
+  <Project Path="src/beginCsh.csproj" />
+</Solution>

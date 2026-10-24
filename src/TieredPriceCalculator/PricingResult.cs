@@ -1,9 +1,18 @@
-using BeginCsh.TieredPriceCalculator;
-static class Program
-{
-    static void Main()
-    {
-        //чекни InputHelper -- я его немного переписал и переместил
+namespace BeginCsh.TieredPriceCalculator;
+
+public sealed record PricingResult
+(
+    int Quantity,
+    decimal BasePrice,
+    decimal DiscountRate,
+    decimal Subtotal,
+    decimal DiscountAmount,
+    decimal TotalPrice,
+    decimal EffectiveUnitPrice
+);
+
+//Метод инициализации:
+/*
         var quantity = InputReader.QuantityInput();
         var promocode = InputReader.PromocodeInput();
         var customerTier = InputReader.CustomerTierInput();
@@ -16,6 +25,4 @@ static class Program
 
         if (anomalyResult is (int additionalQuantity, decimal savedMoney))
             OutputPrinter.PrintWholesaleAnomalyReport(additionalQuantity, savedMoney);
-        //надо еще подумать, как правильно расчитывать объем работы, чтобы понять, когда я могу справедливо давать себе отдых до конца дня, если многое успел
-    }
-}
+    */
