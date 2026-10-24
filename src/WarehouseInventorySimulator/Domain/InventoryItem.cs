@@ -19,7 +19,7 @@ public class InventoryItem
         WarningThreshold = warningThreshold;
     }
 
-    public void Ship(int amount) //с одной стороны -- понятно, почему паблик метод, другой класс должен иметь к нему доступ, но с другой -- по сути, только один класс и должен иметь этот доступ. Тут в идеале должно быть что-то вроде наследования?
+    internal void Ship(int amount)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
         
@@ -31,7 +31,7 @@ public class InventoryItem
         Quantity -= amount;
     }
 
-    public void Restock(int amount)
+    internal void Restock(int amount)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
         

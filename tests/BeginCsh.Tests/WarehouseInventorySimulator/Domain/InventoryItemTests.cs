@@ -6,7 +6,19 @@ public class InventoryItemTests
 {
     private static InventoryItem CreateItemWithQuantity(int quantity) => new InventoryItem("test-item", quantity, 0);
 
-    //нужно ли делать тест валидного создания item?
+    [Fact]
+    public void InventoryItem_ValidItemCreation_ParamsIsEqual()
+    {
+        string sku = "item-test";
+        int quantity = 10;
+        int warningThreshold = 0;
+
+        var item = new InventoryItem(sku, quantity, warningThreshold);
+
+        Assert.Equal(sku, item.Sku);
+        Assert.Equal(quantity, item.Quantity);
+        Assert.Equal(warningThreshold, item.WarningThreshold);
+    }
 
     [Theory]
     [InlineData(null)]

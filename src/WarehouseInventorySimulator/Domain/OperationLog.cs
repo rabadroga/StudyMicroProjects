@@ -6,6 +6,6 @@ public sealed record OperationLog
     OperationType OperationType,
     int Amount, 
     int Quantity,
-    bool IsLowStock, //могу ли я вынести это в логику рекорда как лямбда выражение?
+    bool IsLowStock,
     DateTimeOffset DateTime
 );
