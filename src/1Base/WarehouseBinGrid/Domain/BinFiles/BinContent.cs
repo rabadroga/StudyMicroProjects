@@ -8,5 +8,5 @@ public abstract record BinContent
 
     public record Occupied(string Sku, int Quantity) : BinContent;
 
-    public record Blocked(string Reason) : BinContent;
+    public record Blocked(string Reason, Occupied? OccupiedContent = null) : BinContent;
 }
