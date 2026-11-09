@@ -2,19 +2,11 @@ using System.Diagnostics;
 
 namespace BeginCsh.WarehouseBinGrid;
 
-internal class StorageBin
+public class StorageBin
 {
     internal BinCoordinate Coordinate { get; }
     internal int MaxQuantity { get; }
     internal BinContent Content { get; private set; } = new BinContent.Empty();
-
-    /*internal BinStatus Status => Content switch
-    {
-        BinContent.Empty => BinStatus.Empty,
-        BinContent.Occupied => BinStatus.Occupied,
-        BinContent.Blocked => BinStatus.Blocked,
-        _ => throw new UnreachableException()
-    };*/ //пока здесь оставлю, если не пригодится в аппликейш, то удалю енум статуса
 
     internal StorageBin(BinCoordinate coordinate, int maxQuantity)
     {

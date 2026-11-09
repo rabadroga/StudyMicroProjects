@@ -15,4 +15,6 @@ public abstract record WithdrawOutcome
     public record Empty(string Sku) : WithdrawOutcome;
 
     public record Blocked(BinContent.Blocked BlockedContent) : WithdrawOutcome;
+
+    public record CellNotFound(BinCoordinate Coordinate) : WithdrawOutcome;
 }

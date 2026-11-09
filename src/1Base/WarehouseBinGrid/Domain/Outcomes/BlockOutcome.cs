@@ -9,4 +9,6 @@ public abstract record BlockOutcome
     public record SuccessOccupied(BinContent Content) : BlockOutcome;
 
     public record AlreadyBlocked() : BlockOutcome;
+
+    public record CellNotFound(BinCoordinate Coordinate) : BlockOutcome;
 }

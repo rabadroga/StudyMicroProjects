@@ -11,4 +11,8 @@ public abstract record DepositOutcome
     public record OccupiedWithOtherSku(string InputSku, BinContent.Occupied Occupied) : DepositOutcome;
 
     public record Blocked(string Sku, BinContent.Blocked BlockedContent) : DepositOutcome;
+
+    public record CellNotFound(BinCoordinate Coordinate) : DepositOutcome;
+
+    public record AutoDepositFailed(string sku) : DepositOutcome;
 }

@@ -9,4 +9,6 @@ public abstract record UnblockOutcome
     public record SuccessEmpty() : UnblockOutcome;
 
     public record NotBlocked() : UnblockOutcome;
+
+    public record CellNotFound(BinCoordinate Coordinate) : UnblockOutcome;
 }
