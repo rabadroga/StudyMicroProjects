@@ -6,7 +6,7 @@ public abstract record WithdrawOutcome
 
     public record Success(BinContent.Occupied Content) : WithdrawOutcome;
 
-    public record SuccessEmpty(string Sku, int amount) : WithdrawOutcome;
+    public record SuccessEmpty(string Sku, int Amount) : WithdrawOutcome;
 
     public record InsufficientStock(BinContent.Occupied OccupiedContent, int Amount) : WithdrawOutcome;
 

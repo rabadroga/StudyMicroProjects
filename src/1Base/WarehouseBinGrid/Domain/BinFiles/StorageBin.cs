@@ -12,7 +12,7 @@ public class StorageBin
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxQuantity);
 
-        Coordinate = coordinate != default ? coordinate : throw new ArgumentException("Пустые координаты", nameof(coordinate)); //это же не избыточно?
+        Coordinate = coordinate != default ? coordinate : throw new ArgumentException("Пустые координаты", nameof(coordinate));
 
         MaxQuantity = maxQuantity;
     }
@@ -38,7 +38,7 @@ public class StorageBin
                 {
                     return new DepositOutcome.QuantityExcess(sku, MaxQuantity, amount, occupied.Quantity);
                 }
-                BinContent.Occupied updatedOccupiedContent  = occupied with { Quantity = occupied.Quantity + amount };
+                BinContent.Occupied updatedOccupiedContent = occupied with { Quantity = occupied.Quantity + amount };
                 Content = updatedOccupiedContent;
                 return new DepositOutcome.Success(updatedOccupiedContent);
 
@@ -113,15 +113,15 @@ public class StorageBin
         }
     }
 
-    internal UnblockOutcome UnBlock()
+    internal UnblockOutcome Unblock()
     {
         switch (Content)
         {
             case BinContent.Blocked blocked:
                 if (blocked.OccupiedContent is not null)
                 {
-                   BinContent.Occupied newBlockedOccupiedContent = blocked.OccupiedContent;
-                   Content = newBlockedOccupiedContent;
+                    BinContent.Occupied newBlockedOccupiedContent = blocked.OccupiedContent;
+                    Content = newBlockedOccupiedContent;
                     return new UnblockOutcome.SuccessOccupied(newBlockedOccupiedContent);
                 }
                 else

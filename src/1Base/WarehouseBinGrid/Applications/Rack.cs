@@ -1,6 +1,6 @@
 namespace BeginCsh.WarehouseBinGrid;
 
-public sealed record ShelfRow(char Shelf, IReadOnlyList<StorageBin> Bins); //небольшой рекорд для сортировки и группировки ячеек
+public readonly record struct ShelfRow(char Shelf, IReadOnlyList<StorageBin> Bins); //небольшой рекорд для сортировки и группировки ячеек
 
 public class Rack
 {
@@ -15,11 +15,11 @@ public class Rack
 
         MaxQuantity = maxQuantity;
 
-        char[] shelves = ['A', 'B', 'C', 'D']; //получается
+        char[] shelves = ['A', 'B', 'C', 'D'];
 
         _rackStructure = shelves
                         .SelectMany(shelf => Enumerable.Range(1, 6), (shelf, cell) => new BinCoordinate(shelf, cell))
-                        .ToDictionary(coord => coord, coord => new StorageBin(coord, maxQuantity));
+                        .ToDictionary(coord => coord, coord => new StorageBin(coord, maxQuantity)); //мб стоило реализовать ввод произвольного количестваа полок и ячеек, но как будто это лишнее
     }
 
     private StorageBin? FindBinForDeposit(string sku, int amount)
@@ -64,7 +64,7 @@ public class Rack
         return outcome;
     }
 
-    public WithdrawOutcome Withdraw(BinCoordinate coordinate, string sku, int amount)
+    public WithdrawOutcome Withdraw(BinCoordinate coordinate, string sku, int amount) //возможно еще стоило сделать списание по артикулу, а не только по корде
     {
         if (!_rackStructure.TryGetValue(coordinate, out var bin))
         {
@@ -93,7 +93,7 @@ public class Rack
             return new UnblockOutcome.CellNotFound(coordinate);
         }
 
-        var outcome = bin.UnBlock();
+        var outcome = bin.Unblock();
         return outcome;
     }
 

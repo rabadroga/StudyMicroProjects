@@ -6,5 +6,5 @@ public readonly record struct BinCoordinate
     int Cell
 )
 {
-    public override string ToString() => $"{Shelf}-{Cell:D2}";
+    public override string ToString() => $"{Shelf}-{Cell:D2}"; //нужен ли здесь юнит тест на правильное написание?
 }

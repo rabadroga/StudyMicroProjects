@@ -14,5 +14,5 @@ public abstract record DepositOutcome
 
     public record CellNotFound(BinCoordinate Coordinate) : DepositOutcome;
 
-    public record AutoDepositFailed(string sku) : DepositOutcome;
+    public record AutoDepositFailed(string Sku) : DepositOutcome;
 }
