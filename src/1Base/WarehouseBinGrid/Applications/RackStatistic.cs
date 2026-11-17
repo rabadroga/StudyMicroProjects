@@ -8,5 +8,5 @@ public sealed record RackStatistic
     int BlockedBins
 )
 {
-    float OccupiedPercentage => BinQuantity == 0 ? 0f : (float)OccupiedBins / BinQuantity;
+    public float OccupiedPercentage => BinQuantity == 0 ? 0f : (float)OccupiedBins / BinQuantity;
 };

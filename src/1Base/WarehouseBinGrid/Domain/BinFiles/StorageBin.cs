@@ -4,9 +4,9 @@ namespace BeginCsh.WarehouseBinGrid;
 
 public class StorageBin
 {
-    internal BinCoordinate Coordinate { get; }
-    internal int MaxQuantity { get; }
-    internal BinContent Content { get; private set; } = new BinContent.Empty();
+    public BinCoordinate Coordinate { get; }
+    public int MaxQuantity { get; }
+    public BinContent Content { get; private set; } = new BinContent.Empty();
 
     internal StorageBin(BinCoordinate coordinate, int maxQuantity)
     {
@@ -33,8 +33,8 @@ public class StorageBin
                 Content = newOccupiedContent;
                 return new DepositOutcome.Success(newOccupiedContent);
 
-            case BinContent.Occupied occupied when occupied.Sku == sku:
-                if ((occupied.Quantity + amount) > MaxQuantity)
+            case BinContent.Occupied occupied when string.Equals(occupied.Sku, sku, StringComparison.OrdinalIgnoreCase):
+                if (amount > MaxQuantity - occupied.Quantity)
                 {
                     return new DepositOutcome.QuantityExcess(sku, MaxQuantity, amount, occupied.Quantity);
                 }
@@ -59,7 +59,7 @@ public class StorageBin
 
         switch (Content)
         {
-            case BinContent.Occupied occupied when occupied.Sku == sku:
+            case BinContent.Occupied occupied when string.Equals(occupied.Sku, sku, StringComparison.OrdinalIgnoreCase):
                 if (amount > occupied.Quantity)
                 {
                     return new WithdrawOutcome.InsufficientStock(occupied, amount);
@@ -102,8 +102,9 @@ public class StorageBin
                 return new BlockOutcome.SuccessEmpty();
 
             case BinContent.Occupied occupied:
-                Content = new BinContent.Blocked(reason, occupied);
-                return new BlockOutcome.SuccessOccupied(Content);
+                var blockedContent = new BinContent.Blocked(reason, occupied);
+                Content = blockedContent;
+                return new BlockOutcome.SuccessOccupied(blockedContent);
 
             case BinContent.Blocked:
                 return new BlockOutcome.AlreadyBlocked();

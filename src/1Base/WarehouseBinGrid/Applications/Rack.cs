@@ -1,13 +1,13 @@
 namespace BeginCsh.WarehouseBinGrid;
 
-public readonly record struct ShelfRow(char Shelf, IReadOnlyList<StorageBin> Bins); //небольшой рекорд для сортировки и группировки ячеек
+public readonly record struct ShelfRow(char Shelf, IReadOnlyList<StorageBin> Bins); //небольшой рекорд для сортировки и группировки ячеек -- не вижу никакого смысла выносить его в отдельный файл
 
 public class Rack
 {
     int MaxQuantity { get; }
 
     private readonly Dictionary<BinCoordinate, StorageBin> _rackStructure;
-    public IReadOnlyDictionary<BinCoordinate, StorageBin> RackStructure => _rackStructure;
+    public IReadOnlyDictionary<BinCoordinate, StorageBin> RackStructure => _rackStructure.AsReadOnly();
 
     public Rack(int maxQuantity)
     {
@@ -19,7 +19,7 @@ public class Rack
 
         _rackStructure = shelves
                         .SelectMany(shelf => Enumerable.Range(1, 6), (shelf, cell) => new BinCoordinate(shelf, cell))
-                        .ToDictionary(coord => coord, coord => new StorageBin(coord, maxQuantity)); //мб стоило реализовать ввод произвольного количестваа полок и ячеек, но как будто это лишнее
+                        .ToDictionary(coord => coord, coord => new StorageBin(coord, maxQuantity));
     }
 
     private StorageBin? FindBinForDeposit(string sku, int amount)
@@ -27,13 +27,19 @@ public class Rack
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
-        var occupiedBin = _rackStructure.Values.FirstOrDefault(bin => bin.Content is BinContent.Occupied occ && occ.Sku == sku && bin.MaxQuantity >= (occ.Quantity + amount));
+        var occupiedBin = _rackStructure.Values
+            .OrderBy(b => b.Coordinate.Shelf)
+                .ThenBy(b => b.Coordinate.Cell)
+            .FirstOrDefault(bin => bin.Content is BinContent.Occupied occ && occ.Sku == sku && amount <= (MaxQuantity - occ.Quantity));
         if (occupiedBin is not null)
         {
             return occupiedBin;
         }
 
-        var emptyBin = _rackStructure.Values.FirstOrDefault(bin => bin.Content is BinContent.Empty);
+        var emptyBin = _rackStructure.Values
+            .OrderBy(b => b.Coordinate.Shelf)
+                .ThenBy(b => b.Coordinate.Cell)
+            .FirstOrDefault(bin => bin.Content is BinContent.Empty);
         if (emptyBin is not null)
         {
             return emptyBin;
@@ -64,7 +70,7 @@ public class Rack
         return outcome;
     }
 
-    public WithdrawOutcome Withdraw(BinCoordinate coordinate, string sku, int amount) //возможно еще стоило сделать списание по артикулу, а не только по корде
+    public WithdrawOutcome Withdraw(BinCoordinate coordinate, string sku, int amount)
     {
         if (!_rackStructure.TryGetValue(coordinate, out var bin))
         {
@@ -97,31 +103,30 @@ public class Rack
         return outcome;
     }
 
-    //может стоило оставить все базовые операции с ячейками здесь, а уже группировку, нахождение пустых и тд -- в другом классе?
-    public IEnumerable<StorageBin> GetEmptyBinsByShelf(char shelf) => //а здесь же если будет пустое, то я обработаю в консоли вывода просто? Типо, если эмпти, то будет вывод, что нет такого
+    public IReadOnlyList<StorageBin> GetEmptyBinsByShelf(char shelf) =>
         _rackStructure.Values
             .Where(bin => bin.Coordinate.Shelf == shelf
-                        && bin.Content is BinContent.Empty);
+                        && bin.Content is BinContent.Empty).ToList();
 
-    public IEnumerable<StorageBin> FindBinsBySku(string sku)
+    public IReadOnlyList<StorageBin> FindBinsBySku(string sku)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
 
         return _rackStructure.Values
-            .Where(bin => bin.Content is BinContent.Occupied occBin 
-                && occBin.Sku == sku);
+            .Where(bin => bin.Content is BinContent.Occupied occBin
+                && string.Equals(sku, occBin.Sku, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     public RackStatistic GetRackStatistic()
     {
-        var counts = 
+        var counts =
             _rackStructure.Values
                 .GroupBy(group => group.Content.GetType())
                     .ToDictionary(group => group.Key, group => group.Count());
 
         int empty = counts.GetValueOrDefault(typeof(BinContent.Empty), 0);
         int occupied = counts.GetValueOrDefault(typeof(BinContent.Occupied), 0);
-        int blocked = counts.GetValueOrDefault(typeof(BinContent.Blocked), 0); //Кстати, получается эта сказка .GetType и typeof позволяют бесшовно и без оверхеда (если это понятие тут применимо) сделать из рекорда или ДУ -- енум?
+        int blocked = counts.GetValueOrDefault(typeof(BinContent.Blocked), 0);
 
         return new RackStatistic
             (
@@ -132,9 +137,9 @@ public class Rack
             );
     }
 
-    public IEnumerable<ShelfRow> GetBinsGroupedAndSorted() => 
+    public IReadOnlyList<ShelfRow> GetBinsGroupedAndSorted() =>
         _rackStructure.Values
             .GroupBy(group => group.Coordinate.Shelf)
             .OrderByDescending(group => group.Key)
-            .Select(group => new ShelfRow (group.Key, group.OrderBy(bin => bin.Coordinate.Cell).ToList())); //для многочисленных ячеек может и перегруженно, но для моего случая -- оптимальный вариант
+            .Select(group => new ShelfRow(group.Key, group.OrderBy(bin => bin.Coordinate.Cell).ToList())).ToList(); //для многочисленных ячеек может и перегруженно, но для моего случая -- оптимальный вариант
 }
