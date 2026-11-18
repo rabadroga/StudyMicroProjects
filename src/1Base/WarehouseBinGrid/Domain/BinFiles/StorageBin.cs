@@ -1,0 +1,141 @@
+using System.Diagnostics;
+
+namespace BeginCsh.WarehouseBinGrid;
+
+public class StorageBin
+{
+    public BinCoordinate Coordinate { get; }
+    public int MaxQuantity { get; }
+    public BinContent Content { get; private set; } = new BinContent.Empty();
+
+    internal StorageBin(BinCoordinate coordinate, int maxQuantity)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxQuantity);
+
+        Coordinate = coordinate != default ? coordinate : throw new ArgumentException("Пустые координаты", nameof(coordinate));
+
+        MaxQuantity = maxQuantity;
+    }
+
+    internal DepositOutcome Deposit(string sku, int amount)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
+        switch (Content)
+        {
+            case BinContent.Empty:
+                if (amount > MaxQuantity)
+                {
+                    return new DepositOutcome.QuantityExcess(sku, MaxQuantity, amount, 0);
+                }
+                BinContent.Occupied newOccupiedContent = new BinContent.Occupied(sku, amount);
+                Content = newOccupiedContent;
+                return new DepositOutcome.Success(newOccupiedContent);
+
+            case BinContent.Occupied occupied when string.Equals(occupied.Sku, sku, StringComparison.OrdinalIgnoreCase):
+                if (amount > MaxQuantity - occupied.Quantity)
+                {
+                    return new DepositOutcome.QuantityExcess(sku, MaxQuantity, amount, occupied.Quantity);
+                }
+                BinContent.Occupied updatedOccupiedContent = occupied with { Quantity = occupied.Quantity + amount };
+                Content = updatedOccupiedContent;
+                return new DepositOutcome.Success(updatedOccupiedContent);
+
+            case BinContent.Occupied otherOccupied:
+                return new DepositOutcome.OccupiedWithOtherSku(sku, otherOccupied);
+            case BinContent.Blocked blocked:
+                return new DepositOutcome.Blocked(sku, blocked);
+
+            default:
+                throw new UnreachableException();
+        }
+    }
+
+    internal WithdrawOutcome Withdraw(string sku, int amount)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sku);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
+        switch (Content)
+        {
+            case BinContent.Occupied occupied when string.Equals(occupied.Sku, sku, StringComparison.OrdinalIgnoreCase):
+                if (amount > occupied.Quantity)
+                {
+                    return new WithdrawOutcome.InsufficientStock(occupied, amount);
+                }
+
+                int newQuantity = occupied.Quantity - amount;
+
+                if (newQuantity == 0)
+                {
+                    Content = new BinContent.Empty();
+                    return new WithdrawOutcome.SuccessEmpty(sku, amount);
+                }
+                else
+                {
+                    BinContent.Occupied occupiedContent = occupied with { Quantity = newQuantity };
+                    Content = occupiedContent;
+                    return new WithdrawOutcome.Success(occupiedContent);
+                }
+
+            case BinContent.Occupied:
+                return new WithdrawOutcome.ItemNotFound(sku);
+            case BinContent.Empty:
+                return new WithdrawOutcome.Empty(sku);
+            case BinContent.Blocked blocked:
+                return new WithdrawOutcome.Blocked(blocked);
+
+            default:
+                throw new UnreachableException();
+        }
+    }
+
+    internal BlockOutcome Block(string reason)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+
+        switch (Content)
+        {
+            case BinContent.Empty:
+                Content = new BinContent.Blocked(reason);
+                return new BlockOutcome.SuccessEmpty();
+
+            case BinContent.Occupied occupied:
+                var blockedContent = new BinContent.Blocked(reason, occupied);
+                Content = blockedContent;
+                return new BlockOutcome.SuccessOccupied(blockedContent);
+
+            case BinContent.Blocked:
+                return new BlockOutcome.AlreadyBlocked();
+
+            default:
+                throw new UnreachableException();
+        }
+    }
+
+    internal UnblockOutcome Unblock()
+    {
+        switch (Content)
+        {
+            case BinContent.Blocked blocked:
+                if (blocked.OccupiedContent is not null)
+                {
+                    BinContent.Occupied newBlockedOccupiedContent = blocked.OccupiedContent;
+                    Content = newBlockedOccupiedContent;
+                    return new UnblockOutcome.SuccessOccupied(newBlockedOccupiedContent);
+                }
+                else
+                {
+                    Content = new BinContent.Empty();
+                    return new UnblockOutcome.SuccessEmpty();
+                }
+
+            case BinContent.Occupied or BinContent.Empty:
+                return new UnblockOutcome.NotBlocked();
+
+            default:
+                throw new UnreachableException();
+        }
+    }
+}

@@ -8,4 +8,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="BeginCsh.Tests" />
+  </ItemGroup>
+  
 </Project>

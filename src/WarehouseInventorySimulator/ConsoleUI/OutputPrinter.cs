@@ -2,6 +2,15 @@ using System.Diagnostics;
 
 namespace BeginCsh.WarehouseInventorySimulator;
 
+/* ДЛЯ ПРОГРАМ
+static void Main()
+    {
+        var warehouse = new Warehouse();
+        var menu = new ConsoleMenu(warehouse);
+        menu.Run();
+    }
+*/
+
 public static class OutputPrinter
 {
     public static void PrintWelcome()
