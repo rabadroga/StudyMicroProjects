@@ -1,36 +1,49 @@
-# BeginCsh 
+# BeginCsh
 
-[Русский](#о-проекте) | [English](#about-the-project)
+[Русский](#русский) | [English](#english)
 
 ---
 
 ## Русский
 
 ### О проекте
-Репозиторий для изучения языка **C#** и платформы **.NET**. Здесь собраны решения практических заданий, эксперименты с синтаксисом и небольшие микро-проекты по мере освоения языка: от базовых конструкций до объектно-ориентированного программирования.
+Учебный репозиторий для изучения **C#** и платформы **.NET**. Проект показывает постепенную эволюцию от базовых синтаксических упражнений к структурированным консольным микро-проектам с разделением на слои (`Domain`, `Application`, `ConsoleUI`), использованием `record`-типов, типизированных результатов операций (`Outcomes`) и модульного тестирования на **xUnit**.
+
+### Стек и конфигурация
+- **Платформа:** `.NET 10.0` (`net10.0`)
+- **Язык:** `C#` (`Nullable` и `ImplicitUsings` включены, `AnalysisLevel: latest-recommended`)
+- **Тестирование:** `xUnit` (`2.9.3`), `Microsoft.NET.Test.Sdk`
+- **Решение:** [`StudyMicroProjects.slnx`](StudyMicroProjects.slnx)
 
 ### Структура проекта
-- [`code/Programm.cs`](file:///d:/Fileso/projects/c%23/beginCsh/code/Programm.cs) — точка входа в консольное приложение.
-- [`code/LearningBasics/`](file:///d:/Fileso/projects/c%23/beginCsh/code/LearningBasics) — базовая практика:
-  - Работа со строками и форматированием
-  - Числа, математические операции и точность (`decimal`, `double`)
-  - Циклы (`for`, `while`) и условия
-  - Коллекции (`List<T>`), алгоритмы (например, числа Фибоначчи) и кортежи
-- [`code/ProductOperations/`](file:///d:/Fileso/projects/c%23/beginCsh/code/ProductOperations) — микро-проекты и прикладные модули:
-  - Ввод и валидация данных о товаре (артикул, параметры)
-  - Будущие модули расчета и вывода результатов
+- [`src/Program.cs`](src/Program.cs) — точка входа в консольное приложение (сейчас запускает демонстрационный сценарий для `WarehouseBinGrid`).
+- [`src/1Base/InputHelper.cs`](src/1Base/InputHelper.cs) — общий помощник для чтения и валидации пользовательского ввода из консоли.
+- [`src/LearningBasics/`](src/LearningBasics) — базовая практика по C#: работа со строками, числами (`decimal`, `double`), циклами, коллекциями (`List<T>`), кортежами и базовыми алгоритмами.
+- [`src/ProductOperations/`](src/ProductOperations) — первая версия консольного расчёта стоимости товара (ввод артикула, количества, цены и расчёт НДС 16%).
+- [`src/ProductOperationsV2/`](src/ProductOperationsV2) — переработанная версия расчёта заказа на базе `record Order` с округлением и отдельным выводом чека (`OrderReceiptPrinter`).
+- [`src/PackageDimensionsValidator/`](src/PackageDimensionsValidator) — проверка габаритов ручки и коробки (`ValidateDirect` и `ValidateWithRotation` с учётом поворота) и детализацией превышений по осям.
+- [`src/TieredPriceCalculator/`](src/TieredPriceCalculator) — калькулятор скидок с плоской и прогрессивной шкалами (`flat` / `progressive`), учётом статуса клиента (`Retail`, `Wholesaler`, `Designer`), промокодов и ограничением максимальной скидки.
+- [`src/WarehouseInventorySimulator/`](src/WarehouseInventorySimulator) — симулятор складского учёта с консольным меню (`ConsoleMenu`), журналом операций (`OperationLog`), учётом остатков (`InventoryItem`, `Warehouse`) и типизированными исходами операций.
+- [`src/1Base/WarehouseBinGrid/`](src/1Base/WarehouseBinGrid) — система адресного хранения на стеллаже (`Rack` 4×6: полки `A`–`D`, ячейки `1`–`6`): ручное и автоматическое размещение (`Deposit` / `AutoDeposit`), списание (`Withdraw`), блокировка/разблокировка ячеек, статистика (`RackStatistic`) и консольная визуализация сетки (`SimpleGridRenderer`).
+- [`tests/BeginCsh.Tests/`](tests/BeginCsh.Tests) — модульные тесты на `xUnit` для `WarehouseInventorySimulator` и `WarehouseBinGrid`.
+- [`docs/`](docs) — рабочие заметки и трекер ошибок.
 
 ### Требования и запуск
-- **.NET SDK** 10.0+ (или совместимый)
+- **.NET SDK** 10.0+
 
-Запуск проекта из корневой директории:
+Сборка всего решения:
 ```bash
-dotnet run
+dotnet build StudyMicroProjects.slnx
 ```
 
-Сборка проекта:
+Запуск консольного приложения:
 ```bash
-dotnet build
+dotnet run --project src/beginCsh.csproj
+```
+
+Запуск модульных тестов:
+```bash
+dotnet test StudyMicroProjects.slnx
 ```
 
 ---
@@ -38,29 +51,41 @@ dotnet build
 ## English
 
 ### About the Project
-A repository dedicated to learning **C#** and the **.NET** ecosystem. It contains practical assignments, syntax experiments, and micro-projects created while progressing through learning materials — from core language fundamentals to object-oriented programming.
+A learning repository for **C#** and the **.NET** ecosystem. It demonstrates a progression from fundamental syntax exercises to structured console micro-projects with layered architecture (`Domain`, `Application`, `ConsoleUI`), `record` types, typed operation outcomes (`Outcomes`), and **xUnit** unit tests.
+
+### Tech Stack & Configuration
+- **Target Framework:** `.NET 10.0` (`net10.0`)
+- **Language:** `C#` (`Nullable` and `ImplicitUsings` enabled, `AnalysisLevel: latest-recommended`)
+- **Testing:** `xUnit` (`2.9.3`), `Microsoft.NET.Test.Sdk`
+- **Solution:** [`StudyMicroProjects.slnx`](StudyMicroProjects.slnx)
 
 ### Project Structure
-- [`code/Programm.cs`](file:///d:/Fileso/projects/c%23/beginCsh/code/Programm.cs) — console application entry point.
-- [`code/LearningBasics/`](file:///d:/Fileso/projects/c%23/beginCsh/code/LearningBasics) — foundational practice:
-  - String manipulation and formatting
-  - Numbers, arithmetic operations, and precision types (`decimal`, `double`)
-  - Loops (`for`, `while`) and control flow
-  - Collections (`List<T>`), algorithms (e.g. Fibonacci sequence), and tuples
-- [`code/ProductOperations/`](file:///d:/Fileso/projects/c%23/beginCsh/code/ProductOperations) — micro-projects and practical tasks:
-  - Product data input and validation (SKU/article, specs)
-  - Upcoming calculation and reporting modules
+- [`src/Program.cs`](src/Program.cs) — console application entry point (currently runs a demo scenario for `WarehouseBinGrid`).
+- [`src/1Base/InputHelper.cs`](src/1Base/InputHelper.cs) — shared helper for reading and validating console input.
+- [`src/LearningBasics/`](src/LearningBasics) — foundational C# exercises: strings, numeric types (`decimal`, `double`), loops, collections (`List<T>`), tuples, and basic algorithms.
+- [`src/ProductOperations/`](src/ProductOperations) — initial version of the product cost calculator (SKU, quantity, price input, and 16% VAT calculation).
+- [`src/ProductOperationsV2/`](src/ProductOperationsV2) — refactored order calculator using `record Order`, rounding, and a dedicated receipt printer (`OrderReceiptPrinter`).
+- [`src/PackageDimensionsValidator/`](src/PackageDimensionsValidator) — package fit validator (`ValidateDirect` and `ValidateWithRotation`) with per-axis exceedance details.
+- [`src/TieredPriceCalculator/`](src/TieredPriceCalculator) — discount calculator supporting flat and progressive tiers, customer categories (`Retail`, `Wholesaler`, `Designer`), promo codes, and a maximum discount cap.
+- [`src/WarehouseInventorySimulator/`](src/WarehouseInventorySimulator) — warehouse inventory simulator featuring a console menu (`ConsoleMenu`), operation audit log (`OperationLog`), stock management (`InventoryItem`, `Warehouse`), and typed operation outcomes.
+- [`src/1Base/WarehouseBinGrid/`](src/1Base/WarehouseBinGrid) — bin-level rack storage system (`Rack` 4×6: shelves `A`–`D`, cells `1`–`6`) supporting manual and automatic placement (`Deposit` / `AutoDeposit`), withdrawals (`Withdraw`), bin blocking/unblocking, rack statistics (`RackStatistic`), and a console grid renderer (`SimpleGridRenderer`).
+- [`tests/BeginCsh.Tests/`](tests/BeginCsh.Tests) — `xUnit` unit tests covering `WarehouseInventorySimulator` and `WarehouseBinGrid`.
+- [`docs/`](docs) — study notes and error tracker.
 
 ### Prerequisites & Running
-- **.NET SDK** 10.0+ (or compatible)
+- **.NET SDK** 10.0+
 
-Run the project from the root folder:
+Build the solution:
 ```bash
-dotnet run
+dotnet build StudyMicroProjects.slnx
 ```
 
-Build the project:
+Run the console application:
 ```bash
-dotnet build
+dotnet run --project src/beginCsh.csproj
 ```
 
+Run unit tests:
+```bash
+dotnet test StudyMicroProjects.slnx
+```
